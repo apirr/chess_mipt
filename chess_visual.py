@@ -18,8 +18,9 @@ class Drawer:
                     print(cell[0])
                 else:
                     print(cell[0], end=' ')
-
-
-
-drawer = Drawer([0])
-print(drawer.bot_print())
+    def make_board_for_print(self):
+        for chess_piece in self.board:
+            if chess_piece.color == 'white':
+                self.board_for_print[chess_piece.position[1]][chess_piece.position[0]] = chess_piece.type[0].upper()
+            else:
+                self.board_for_print[chess_piece.position[1]][chess_piece.position[0]] = chess_piece.type[0]
