@@ -1,11 +1,25 @@
 
 
-class Chess_piece:
-    def __init__(self, type: str , color: str, position: list):
-        self.dead = False
-        self.type = type
-        self.color = color
-        self.position = position
+class Drawer:
+    def __init__(self, board):
+        self.board = board
+        self.board_for_print = [[[0] for i in range(8)] for i in range(8)]
+        self.smth_is_moved = False
+    def move(self, pos): #Вообще кажется, что эта проверка не должна происходить в дровере. Дровер он рисует
+        for chess_piece in self.board:
+            if chess_piece.moved:
+                self.smth_is_moved = True
+        if not self.smth_is_moved:
+            return False #дальше уже в telegram_connect.py/bot_main.py сделать вывод сообщения 'Your turn is wrong'
+    def bot_print(self):
+        for row in self.board_for_print:
+            for cell in row:
+                if cell is row[7]:
+                    print(cell[0])
+                else:
+                    print(cell[0], end=' ')
 
 
 
+drawer = Drawer([0])
+print(drawer.bot_print())
