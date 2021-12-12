@@ -107,7 +107,12 @@ class Board(Chess_piece):
 			return False
 		elif is_this_move_legal == 'Рокировка возможна':
 			moving_figure, resulting_figure = resulting_figure, moving_figure
-		elif is_this_move_legal =
+			moving_figure.position = target_position
+			resulting_figure.position = initial_position
+		elif is_this_move_legal == True:
+			moving_figure, resulting_figure = resulting_figure, moving_figure
+			moving_figure.position = target_position
+			resulting_figure = Chess_piece()
 
 
 
