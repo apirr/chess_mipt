@@ -7,6 +7,14 @@ GLOBAL_CHESS_PIECES_MOVES = {
 	'P': [[0, 1], [1, 1], [-1, 1]]
 }
 
+def sign(x):
+	if(x>0):
+		return 1
+	elif(x<0):
+		return -1
+	else:
+		return 0
+
 class Chess_piece:
 	'''
 	МЕТОДЫ
@@ -65,12 +73,39 @@ class Chess_piece:
 			if v == move_vector:
 				can_it_go_there = True
 		return can_it_go_there
+	def return_a_unit_vector(self, vector):
+		'''Возвращает единичный вектор в ту сторону, в которую хочется сходить. Нужно, чтобы итеративно проверить не стоит ли кого на пути. Принимает на вход вектор.'''
+		if self.type == 'empty':
+			return [0, 0]
+		else:
+			return [sign(vector[0]), sign(vector[1])]
+
 
 class Board(Chess_piece):
+	'''
+	METHODS:
+
+	The only methods to be used by an end user of this code are:
+
+	is_this_move_legal(self, initial_position, target_position)  checks the legality of a move
+
+	move_this_chess_piece(self, initial_position, target_position) makes the move if it is legal and returns False otherwise
+
+	def checkmate(self, initial_position, target_position)
+
+	'''
 	def __init__(self):
 		self.chess_pieces = [Сhess_piece() for i in range(7)]*8
+		black_id = 'black'
+		white_id = 'white'
+		#game_id = 'this may not be required' #может быть не надо в зависимости от того как будете реализовывать
+		whose_move_it_is = 'white' #меняйте после каждого успешного хода
 		print(self.chess_pieces)
-	def is_this_move_legal(self, initial_position, target_position):
+
+	def is_in_bounds(self, position=None):
+		return ((0 <= position[0] <= 7) and (0 <= position[1] <= 7))	
+
+	def is_this_move_pseudo_legal_without_interruptions(self, initial_position, target_position):
 		moving_figure = self.chess_pieces[initial_position[0]][initial_position[1]]
 		resulting_figure = self.chess_pieces[target_position[0]][target_position[1]]
 
@@ -97,8 +132,34 @@ class Board(Chess_piece):
 			return 'Рокировка возможна'
 		else:
 			return moving_figure.can_it_go_there[target_position]
-		
 
+	def is_this_move_pseudo_legal_with_interruptions(self, initial_position, target_position):
+		moving_figure = self.chess_pieces[initial_position[0]][initial_position[1]]
+		resulting_figure = self.chess_pieces[target_position[0]][target_position[1]]
+		move_vector = [target_position[0] - self.position[0], target_position[1] - self.position[1]]
+		legality = self.is_this_move_pseudo_legal_without_interruptions(initial_position, target_position)
+		if legality == False:
+			return legality
+		else:
+			if moving_figure.type == 'P' or moving_figure.type == 'N':
+				return legality
+			unit_vector = moving_figure.return_a_unit_vector(move_vector)
+			iterating_vector = unit_vector
+		# кусок кода далее проверяет, можно ли так походить, проверяя можно ли так походить на каждую клетку по прямой соединяющей начальную и конечную точки
+			while(iterating_vector != unit_vector and (abs(iterating_vector[0])+abs(iterating_vector[1]) < 200)): #второе условие на всякий случай -- если вдруг все пойдет неправильно 
+				temporary_target_position = [initial_position[0] + iterating_vector[0], initial_position[1] + iterating_vector[1]]
+				if self.is_this_move_pseudo_legal_without_interruptions(initial_position, temporary_target_position) == False:
+					return False
+				else:
+					iterating_vector = [iterating_vector[0] + unit_vector[0], iterating_vector[1] + unit_vector[1]]
+			return legality
+	def checkmate():
+		#FIXME
+
+	def is_this_move_legal(self, initial_position, target_position):
+		#FIXME Эта функция будет работать когда появится распознание шахов (и матов)
+		return True
+		
 	def move_this_chess_piece(self, initial_position, target_position):
 		moving_figure = self.chess_pieces[initial_position[0]][initial_position[1]]
 		resulting_figure = self.chess_pieces[target_position[0]][target_position[1]]
