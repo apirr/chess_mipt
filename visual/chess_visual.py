@@ -1,4 +1,5 @@
 from PIL import Image
+from os import remove
 
 'PIL version is 8.3.2'
 
@@ -39,9 +40,9 @@ class Drawer:
         :param board: объект класса Board, доска с фигурами
         '''
 
-        self.board = board
+        self.board = board.chess_pieces
         self.board_for_print_txt = [[['**'] for i in range(8)] for i in range(8)]
-        self.board_for_print_png = Image.open('Images/chessboard.png')
+        self.board_for_print_png = Image.open('visual/images/chessboard.png')
         self.print_type = 'none'
 
     def bot_print(self):
@@ -61,9 +62,9 @@ class Drawer:
                         print_string = print_string + cell[0] + ' '
             return print_string
         elif self.print_type == 'image':
-            self.board_for_print_png.show()
-            pass  # TODO: '''попытаться сделать так, чтобы картинка передавалась боту с возможностью отослать юзеру,
-            # но ее не надо было сохранять на компьютер'''
+            ingame_board_image_filename = self.board_for_print_png.filename
+            self.board_for_print_png = Image.open('visual/images/chessboard.png')
+            return ingame_board_image_filename
         elif self.print_type == 'none':
             'Можно убрать этот пункт, если перед началом партии просить выбрать юзера формат вывода шахматной доски'
             return 'Please choose board image type: text or image'
@@ -86,10 +87,31 @@ class Drawer:
             self.print_type = 'text'
         elif print_type == 'image':
             for ch_p in self.board:
-                ch_p_image = Image.open(f'Images/wikipedia/{ch_p.color + ch_p.type}.png')
-                ch_p_image = resized_chess_piece_image(self.board_for_print_png, ch_p_image)
-                paste_box = paste_box_creator(ch_p, ch_p_image)
-                self.board_for_print_png.paste(ch_p_image, paste_box, mask=ch_p_image)
+                with Image.open(f'Visual/images/wikipedia/{ch_p.color + ch_p.type}.png') as ch_p_image:
+                    ch_p_image = resized_chess_piece_image(self.board_for_print_png, ch_p_image)
+                    paste_box = paste_box_creator(ch_p, ch_p_image)
+                    self.board_for_print_png.paste(ch_p_image, paste_box, mask=ch_p_image)
+                    self.board_for_print_png.save('visual/images/ingame.png')
+                self.board_for_print_png = Image.open('visual/images/ingame.png')
             self.print_type = 'image'
         else:
             self.print_type = print_type
+
+        def cleaner(self):
+            remove('visual/images/ingame.png')
+
+
+class Ch_p:
+    def __init__(self):
+        self.color = 'w'
+        self.type = 'K'
+        self.position = [3, 4]
+ch_p = Ch_p()
+class Board():
+    def __init__(self):
+        self.chess_pieces = [ch_p]
+board = Board()
+drawer = Drawer(board)
+drawer.make_board_for_print('image')
+drawer.bot_print()
+
