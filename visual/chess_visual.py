@@ -5,12 +5,10 @@ from os import remove
 
 
 def resized_chess_piece_image(where_to_paste_image: Image, what_to_paste_image: Image):
-    '''
-    Change chess_piece image size so it fits board image size.
+    """Change chess_piece image size so it fits board image size.
     :param where_to_paste_image: board .png PIL image
     :param what_to_paste_image: chess_piece .png PIL image
-    :return: resized chess_piece .png PIL image
-    '''
+    :return: resized chess_piece .png PIL image"""
 
     ch_p_image_size_width = (where_to_paste_image.size[0] - 100) // 8
     ch_p_image_size_height = (where_to_paste_image.size[1] - 103) // 8
@@ -18,13 +16,11 @@ def resized_chess_piece_image(where_to_paste_image: Image, what_to_paste_image: 
 
 
 def paste_box_creator(chess_piece, what_to_paste_image: Image):
-    '''
-    Create tuple (a,b,c,d) where a,b is coordinates of left upper corner
+    """Create tuple (a,b,c,d) where a,b is coordinates of left upper corner
     and c,d is coordinates of right lower corner of what_to_paste_image in where_to_paste_image.
     :param chess_piece: Chess_piece object
     :param what_to_paste_image: chess_piece .png PIL image
-    :return: 4-tuple (left, upper, right, lower).
-    '''
+    :return: 4-tuple (left, upper, right, lower)."""
 
     left = 50 + chess_piece.position[0] * what_to_paste_image.size[0]
     upper = 52 + (7 - chess_piece.position[1]) * what_to_paste_image.size[1]
@@ -35,10 +31,7 @@ def paste_box_creator(chess_piece, what_to_paste_image: Image):
 
 class Drawer:
     def __init__(self, board):
-
-        '''
-        :param board: объект класса Board, доска с фигурами
-        '''
+        """:param board: объект класса Board, доска с фигурами"""
 
         self.board = board.chess_pieces
         self.board_for_print_txt = [[['**'] for i in range(8)] for i in range(8)]
@@ -46,12 +39,8 @@ class Drawer:
         self.print_type = 'none'
 
     def bot_print(self):
-
-        '''
-        Make board image for user. Board image can be a string or a .png file.
-        :return: board image in chosen format or request to choose format
-        '''
-
+        """Make board image for user. Board image can be a string or a .png file.
+        :return: board image in chosen format or request to choose format"""
         if self.print_type == 'text':
             print_string = ''
             for row in self.board_for_print_txt:
@@ -73,11 +62,8 @@ class Drawer:
                    f'Please choose board image type: text or image'
 
     def make_board_for_print(self, print_type):
-
-        '''
-        Обновляет board_for_print_txt на основе позиций фигур, хранящихся в board.
-        print_type = 'text' or 'image'
-        '''
+        """Обновляет board_for_print_txt на основе позиций фигур, хранящихся в board.
+        print_type = 'text' or 'image' """
 
         'ch_p --- chess_piece'
 
@@ -97,21 +83,5 @@ class Drawer:
         else:
             self.print_type = print_type
 
-        def cleaner(self):
-            remove('visual/images/ingame.png')
-
-
-class Ch_p:
-    def __init__(self):
-        self.color = 'w'
-        self.type = 'K'
-        self.position = [3, 4]
-ch_p = Ch_p()
-class Board():
-    def __init__(self):
-        self.chess_pieces = [ch_p]
-board = Board()
-drawer = Drawer(board)
-drawer.make_board_for_print('image')
-drawer.bot_print()
-
+    def cleaner(self):
+        remove('visual/images/ingame.png')
