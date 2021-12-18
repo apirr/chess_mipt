@@ -1,8 +1,6 @@
 from PIL import Image
 from os import remove
 
-'PIL version is 8.3.2'
-
 
 def resized_chess_piece_image(where_to_paste_image: Image, what_to_paste_image: Image):
     """Change chess_piece image size so it fits board image size.
