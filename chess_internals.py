@@ -94,12 +94,14 @@ class Board(Chess_piece):
 	def checkmate(self, initial_position, target_position)
 
 	'''
-	def __init__(self):
+	def __init__(self, white_id, game_password):
 		self.chess_pieces = [Сhess_piece() for i in range(7)]*8
 		black_id = 'black'
 		white_id = 'white'
-		#game_id = 'this may not be required' #может быть не надо в зависимости от того как будете реализовывать
+		game_password = 'this may not be required' #может быть не надо в зависимости от того как будете реализовывать
 		whose_move_it_is = 'white' #меняйте после каждого успешного хода
+		is_there_a_check_against_the_white = False
+		is_there_a_check_against_the_black = False
 		print(self.chess_pieces)
 
 	def is_in_bounds(self, position=None):
@@ -118,18 +120,20 @@ class Board(Chess_piece):
 
 		#этот кусок кода проверяет, как может есть пешка, если ходящая фигура пешка
 
-		if(moving_figure.type == "p" and self.chess_pieces[initial_position].color == 'w' and resulting_figure.color == 'b'): 
+		if(moving_figure.type == "P" and self.chess_pieces[initial_position].color == 'w' and resulting_figure.color == 'b'): 
 			if ([moving_figure.position + 1, moving_figure.position + 1] == target_position) and (self.chess_pieces[target_position[0]][target_position[1]].position != 'empty'):
 				return True
 			elif ([moving_figure.position - 1, moving_figure.position + 1] == target_position) and (resulting_figure.position != 'empty'):
 				return True			
-		elif(moving_figure.type == "p" and moving_figure.color == 'b' and resulting_figure.color == 'w'):
+		elif(moving_figure.type == "P" and moving_figure.color == 'b' and resulting_figure.color == 'w'):
 			if ([moving_figure.position + 1, moving_figure.position - 1] == target_position) and (resulting_figure.position != 'empty'):
 				return True
 			elif ([moving_figure.position - 1, moving_figure.position - 1] == target_position) and (self.chess_pieces[target_position[0]][target_position[1]].position != 'empty'): # тут кончается кусок кода с проверкой на пешку
 				return True			
-		elif(moving_figure.type == "r" and moving_figure.have_i_moved == False and resulting_figure.type == 'k' and resulting_figure.have_i_moved == False):
+		elif(moving_figure.type == "R" and moving_figure.have_i_moved == False and resulting_figure.type == 'K' and resulting_figure.have_i_moved == False):
 			return 'Рокировка возможна'
+		elif(resulting_figure.type == 'K'):
+			return 'You cannot eat the king'
 		else:
 			return moving_figure.can_it_go_there[target_position]
 
@@ -138,7 +142,7 @@ class Board(Chess_piece):
 		resulting_figure = self.chess_pieces[target_position[0]][target_position[1]]
 		move_vector = [target_position[0] - self.position[0], target_position[1] - self.position[1]]
 		legality = self.is_this_move_pseudo_legal_without_interruptions(initial_position, target_position)
-		if legality == False:
+		if legality != True:
 			return legality
 		else:
 			if moving_figure.type == 'P' or moving_figure.type == 'N':
@@ -146,25 +150,20 @@ class Board(Chess_piece):
 			unit_vector = moving_figure.return_a_unit_vector(move_vector)
 			iterating_vector = unit_vector
 		# кусок кода далее проверяет, можно ли так походить, проверяя можно ли так походить на каждую клетку по прямой соединяющей начальную и конечную точки
-			while(iterating_vector != unit_vector and (abs(iterating_vector[0])+abs(iterating_vector[1]) < 200)): #второе условие на всякий случай -- если вдруг все пойдет неправильно 
+			while(iterating_vector != unit_vector and (abs(iterating_vector[0])+abs(iterating_vector[1]) < 200)): #второе условие на всякий случай -- если вдруг все пойдет неправильно чтобы цикл не стал бесконечным 
 				temporary_target_position = [initial_position[0] + iterating_vector[0], initial_position[1] + iterating_vector[1]]
-				if self.is_this_move_pseudo_legal_without_interruptions(initial_position, temporary_target_position) == False:
+				if self.is_this_move_pseudo_legal_without_interruptions(initial_position, temporary_target_position) != True:
 					return False
 				else:
 					iterating_vector = [iterating_vector[0] + unit_vector[0], iterating_vector[1] + unit_vector[1]]
 			return legality
-	def checkmate():
-		#FIXME
 
-	def is_this_move_legal(self, initial_position, target_position):
-		#FIXME Эта функция будет работать когда появится распознание шахов (и матов)
-		return True
 		
-	def move_this_chess_piece(self, initial_position, target_position):
+	def pseudo_move_this_chess_piece(self, initial_position, target_position):
 		moving_figure = self.chess_pieces[initial_position[0]][initial_position[1]]
 		resulting_figure = self.chess_pieces[target_position[0]][target_position[1]]
-		is_this_move_legal = self.is_this_move_legal(initial_position, target_position)
-		if is_this_move_legal == False:
+		is_this_move_legal = self.is_this_move_pseudo_legal_with_interruptions(initial_position, target_position)
+		if is_this_move_legal != True:
 			return False
 		elif is_this_move_legal == 'Рокировка возможна':
 			moving_figure, resulting_figure = resulting_figure, moving_figure
@@ -174,6 +173,48 @@ class Board(Chess_piece):
 			moving_figure, resulting_figure = resulting_figure, moving_figure
 			moving_figure.position = target_position
 			resulting_figure = Chess_piece()
+
+	def is_it_a_check(self, initial_position, target_position):
+		check_against_the_white = False
+		check_against_the_black = False
+		backup = self.chess_pieces
+		if self.is_this_move_pseudo_legal_with_interruptions(initial_position, target_position)!=True:
+			return 'This move you are trying to make is not possible'
+		move = self.pseudo_move_this_chess_piece(initial_position, target_position)
+		white_king = Chess_piece()
+		black_king = Chess_piece()
+		for el in self.chess_pieces:
+			if el.type == 'K' and el.color == 'w':
+				white_king = el
+			elif el.type == 'K' and el.color == 'b':
+				black_king = el
+		if whose_move_it_is == 'white':
+			for el in self.chess_pieces:
+				if el.color == 'white' and self.is_this_move_pseudo_legal_without_interruptions(el.position, black_king.position) == 'You cannot eat the king':
+					check_against_the_black = True
+				if el.color == 'black' and self.is_this_move_pseudo_legal_without_interruptions(el.position, black_king.position) == 'You cannot eat the king':
+					check_against_the_white = True
+		self.chess_pieces = backup
+		return [check_against_the_white, check_against_the_black]
+
+
+	def is_this_move_legal(self, initial_position, target_position):
+		legality = self.is_this_move_pseudo_legal_with_interruptions(initial_position, target_position)
+		check = self.is_it_a_check(initial_position, target_position)
+		if self.whose_move_it_is == 'white':
+			check = check[0]
+		else:
+			check = check[1]
+		if legality != True or check == True:
+			return False
+
+	def move_this_chess_piece(self, initial_position, target_position):
+		legality = self.is_this_move_legal(initial_position, target_position)
+		if legality != True:
+			return False
+		else:
+			self.pseudo_move_this_chess_piece(initial_position, target_position)
+			return True
 
 
 
