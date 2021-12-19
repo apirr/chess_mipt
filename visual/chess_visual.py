@@ -1,5 +1,4 @@
 from PIL import Image
-from os import remove
 
 
 def resized_chess_piece_image(where_to_paste_image: Image, what_to_paste_image: Image):
