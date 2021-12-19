@@ -1,3 +1,5 @@
+import copy
+
 GLOBAL_CHESS_PIECES_MOVES = {
 	'K': [[1, 1], [0, 1], [1, 0], [-1, -1], [0, -1], [-1, 0], [1, -1], [-1, 1]],
 	'R': [[0, 0], [0, 0], [0, 0], [0, 0], [0, 1], [1, 0], [-1, 0], [0, -1], [0, 2], [2, 0], [-2, 0], [0, -2], [0, 3], [3, 0], [-3, 0], [0, -3], [0, 4], [4, 0], [-4, 0], [0, -4], [0, 5], [5, 0], [-5, 0], [0, -5], [0, 6], [6, 0], [-6, 0], [0, -6], [0, 7], [7, 0], [-7, 0], [0, -7]],
@@ -9,6 +11,13 @@ GLOBAL_CHESS_PIECES_MOVES = {
 	'Pw': [[0, 1]],
 	'Pb': [[0, -1]]
 }
+
+def pr_br(brd):
+	for array in brd.chess_pieces:
+		for el in array:
+			print(el.type+el.color, end = ' ')
+		print('\n')
+	(brd.chess_pieces[1][6].can_it_go_there([1, 4]))
 
 def sign(x):
 	if(x>0):
@@ -71,6 +80,8 @@ class Chess_piece:
 		can_it_go_there = False
 		if not self.is_in_bounds(target_position):
 			return False
+		if self.position == 'empty':
+			return False
 		vector_set = self.move_vectors()
 		move_vector = [target_position[0] - self.position[0],
 					   target_position[1] - self.position[1]]
@@ -130,6 +141,12 @@ class Board(Chess_piece):
 		self.is_there_a_check_against_the_white = False
 		self.is_there_a_check_against_the_black = False
 
+	def next_move(self):
+		if(self.whose_move_it_is == 'w'):
+			self.whose_move_it_is = 'b'
+		else:
+			self.whose_move_it_is = 'w'
+
 	def is_in_bounds(self, position=None):
 		return ((0 <= position[0] <= 7) and (0 <= position[1] <= 7))	
 
@@ -139,8 +156,8 @@ class Board(Chess_piece):
 
 		if(moving_figure.position == 'empty'):
 			return False
-		if(moving_figure.color != self.whose_move_it_is):
-			return False
+		# if(moving_figure.color != self.whose_move_it_is):
+		# 	return False
 		#if moving_figure.can_it_go_there(target_position) == False:
 			#return False
 
@@ -164,6 +181,8 @@ class Board(Chess_piece):
 				return True			
 		elif(moving_figure.type == "R" and moving_figure.have_i_moved == False and resulting_figure.type == 'K' and resulting_figure.have_i_moved == False):
 			return 'Рокировка возможна'
+		elif(moving_figure.type == "K" and moving_figure.have_i_moved == False and resulting_figure.type == 'R' and resulting_figure.have_i_moved == False):
+			return 'Рокировка возможна'
 		elif moving_figure.color == resulting_figure.color:
 			return False
 		else:
@@ -172,6 +191,8 @@ class Board(Chess_piece):
 	def is_this_move_pseudo_legal_with_interruptions(self, initial_position, target_position):
 		moving_figure = self.chess_pieces[initial_position[0]][initial_position[1]]
 		resulting_figure = self.chess_pieces[target_position[0]][target_position[1]]
+		if moving_figure.type == "K" and resulting_figure.type == "R" and moving_figure.color == resulting_figure.color:
+			return self.is_this_move_pseudo_legal_with_interruptions(resulting_figure.position, moving_figure.position)
 		move_vector = [target_position[0] - initial_position[0], target_position[1] - initial_position[1]]
 		legality = self.is_this_move_pseudo_legal_without_interruptions(initial_position, target_position)
 		if legality != True:
@@ -195,7 +216,7 @@ class Board(Chess_piece):
 		moving_figure = self.chess_pieces[initial_position[0]][initial_position[1]]
 		resulting_figure = self.chess_pieces[target_position[0]][target_position[1]]
 		is_this_move_legal = self.is_this_move_pseudo_legal_with_interruptions(initial_position, target_position)
-		if is_this_move_legal != True:
+		if is_this_move_legal != True and is_this_move_legal != "Рокировка возможна":
 			return False
 		elif is_this_move_legal == 'Рокировка возможна':
 			moving_figure, resulting_figure = resulting_figure, moving_figure
@@ -213,10 +234,15 @@ class Board(Chess_piece):
 	def is_it_a_check(self, initial_position, target_position):
 		check_against_the_white = False
 		check_against_the_black = False
-		backup = self.chess_pieces
+		backup = copy.deepcopy(self.chess_pieces)
+		# for rows in backup:
+		# 	for el in rows:
+		# 		print(el.type, end = ' ')
+		# 	print('\n')
+
 		if self.is_this_move_pseudo_legal_with_interruptions(initial_position, target_position)!=True:
 			return 'This move you are trying to make is not possible'
-		move = self.pseudo_move_this_chess_piece(initial_position, target_position)
+		self.pseudo_move_this_chess_piece(initial_position, target_position)
 		white_king = Chess_piece()
 		black_king = Chess_piece()
 		for arrays in self.chess_pieces:
@@ -225,30 +251,32 @@ class Board(Chess_piece):
 					white_king = el
 				elif el.type == 'K' and el.color == 'b':
 					black_king = el
-		if self.whose_move_it_is == 'white':
-			for arrays in self.chess_pieces:
-				for el in arrays:
-					if el.color == 'w' and self.is_this_move_pseudo_legal_with_interruptions(el.position, black_king.position) == True:
-						check_against_the_black = True
-					if el.color == 'b' and self.is_this_move_pseudo_legal_with_interruptions(el.position, white_king.position) == True:
-						check_against_the_white = True
+		for arrays in self.chess_pieces:
+			for el in arrays:
+				if el.color == 'w' and self.is_this_move_pseudo_legal_with_interruptions(el.position, black_king.position) == True:
+					check_against_the_black = True
+				if el.color == 'b' and self.is_this_move_pseudo_legal_with_interruptions(el.position, white_king.position) == True:
+					check_against_the_white = True
 		self.chess_pieces = backup
 		return [check_against_the_white, check_against_the_black]
 
 
 	def is_this_move_legal(self, initial_position, target_position):
+		moving_figure = self.chess_pieces[initial_position[0]][initial_position[1]]
+		resulting_figure = self.chess_pieces[target_position[0]][target_position[1]]
+
 		legality = self.is_this_move_pseudo_legal_with_interruptions(initial_position, target_position)
 		check = self.is_it_a_check(initial_position, target_position)
-		check = [False, False]
-		if self.whose_move_it_is == 'white':
+		# check = [False, False]
+		if moving_figure.color == 'w':
 			check = check[0]
 		else:
 			check = check[1]
-		if self.chess_pieces[target_position[0]][target_position[1]].type == "K":
+		if resulting_figure.type == "K" and (moving_figure.color != resulting_figure.color or moving_figure.type != "R"):
 			return "Нельзя есть короля."
 		if check == True:
 			return "Под шахом следующий ход должен снимать шах. Есть три попытки выйти из-под шаха. После этого объявляется мат."
-		if legality != True:
+		if legality != True and legality != "Рокировка возможна":
 			return "Так нельзя ходить."
 		else:
 		 return True
@@ -259,10 +287,26 @@ class Board(Chess_piece):
 			return False
 		else:
 			self.pseudo_move_this_chess_piece(initial_position, target_position)
+			self.next_move()
 			return True
 
 
-# brd = Board('oieef', 'uinfui')
+brd = Board('oieef', 'uinfui')
+
+brd.move_this_chess_piece([4, 1], [4, 3])
+brd.move_this_chess_piece([3, 0], [6, 3])
+brd.move_this_chess_piece([2,1], [2,3])
+brd.move_this_chess_piece([3,1], [3,3])
+brd.move_this_chess_piece([2,0], [5,3])
+brd.move_this_chess_piece([1,0], [3, 1])
+print(brd.pseudo_move_this_chess_piece([0,0], [4, 0])) 
+
+
+# print(brd.is_it_a_check([4, 0], [4,1]))
+# print(brd.is_this_move_pseudo_legal_with_interruptions([4,0], [4,1]))
+
+pr_br(brd)
+
 
 # # print(brd.is_this_move_legal([1, 6], [2,5]))
 # print(brd.move_this_chess_piece([1, 6], [1,4]))
@@ -271,11 +315,6 @@ class Board(Chess_piece):
 # print(brd.move_this_chess_piece([1,2], [0,1]))
 
 
-# for array in brd.chess_pieces:
-# 	for el in array:
-# 		print(el.type, end = ' ')
-# 	print('\n')
-#(brd.chess_pieces[1][6].can_it_go_there([1, 4]))
 
 
 
