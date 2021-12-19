@@ -31,7 +31,6 @@ class Drawer:
         """:param board: объект класса Board, доска с фигурами"""
 
         self.board = board.chess_pieces
-        self.board_for_print_txt = [[['**'] for i in range(8)] for i in range(8)]
         self.board_for_print_png = Image.open('visual/images/chessboard.png')
 
     def bot_print(self):

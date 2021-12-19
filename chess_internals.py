@@ -37,11 +37,11 @@ class Chess_piece:
 		self.have_i_moved --- то, ходила ли фигура в этой игре
 		'''
 		assert (color == 'w' or color == 'b' or color == 'empty')
-		assert (((0 <= position[0] <= 7) and (0 <= position[0] <= 7)) or position == empty)
+		#assert (((0 <= position[0] <= 7) and (0 <= position[0] <= 7)) or position == 'empty')
 		self.type = type
 		self.color = color
 		self.dead = False
-		self.position = postion
+		self.position = position
 		self.have_i_moved = False
 
 	def move_vectors(self):
@@ -63,7 +63,7 @@ class Chess_piece:
 		# НЕЛЬЗЯ ИСПОЛЬЗОВАТЬ ЭТОТ МЕТОД ЕСЛИ ВЫ НЕ ПОНИМАЕТЕ ЧТО ТВОРИТЕ С ЭТИМ МЕТОДОМ. ИСПОЛЬЗУЙТЕ МЕТОД В КЛАССЕ BOARD
 		assert self.type != 'P'
 		can_it_go_there = False
-		if not self.is_in_bounds(target_coordinate):
+		if not self.is_in_bounds(target_position):
 			return False
 		vector_set = self.move_vectors()
 
@@ -95,9 +95,10 @@ class Board(Chess_piece):
 
 	'''
 	def __init__(self, white_id, game_password):
-		self.chess_pieces = []
+		self.chess_pieces = [[1]*8]*8
 		for i in range(8):
-			self.chess_pieces.append([Сhess_piece() for i in range(7)])
+			for j in range(8):
+				self.chess_pieces[i][j] = Chess_piece()
 		for i in range(8):
 			self.chess_pieces[i][1] = Chess_piece('P', 'w', [i, 1])
 			self.chess_pieces[i][6] = Chess_piece('P', 'b', [i, 1])
@@ -117,14 +118,12 @@ class Board(Chess_piece):
 		self.chess_pieces[5][7] = Chess_piece('B', 'w', [5, 0])
 		self.chess_pieces[6][7] = Chess_piece('N', 'w', [6, 0])
 		self.chess_pieces[7][7] = Chess_piece('R', 'w', [7, 0])
-
-		black_id = 'black'
-		white_id = 'white'
-		game_password = 'this may not be required' #может быть не надо в зависимости от того как будете реализовывать
-		whose_move_it_is = 'white' #меняйте после каждого успешного хода
-		is_there_a_check_against_the_white = False
-		is_there_a_check_against_the_black = False
-		print(self.chess_pieces)
+		self.black_id = white_id
+		self.white_id = 'white'
+		self.game_password = game_password
+		self.whose_move_it_is = 'white' #меняйте после каждого успешного хода
+		self.is_there_a_check_against_the_white = False
+		self.is_there_a_check_against_the_black = False
 
 	def is_in_bounds(self, position=None):
 		return ((0 <= position[0] <= 7) and (0 <= position[1] <= 7))	
@@ -210,7 +209,7 @@ class Board(Chess_piece):
 				white_king = el
 			elif el.type == 'K' and el.color == 'b':
 				black_king = el
-		if whose_move_it_is == 'white':
+		if self.whose_move_it_is == 'white':
 			for el in self.chess_pieces:
 				if el.color == 'white' and self.is_this_move_pseudo_legal_without_interruptions(el.position, black_king.position) == 'You cannot eat the king':
 					check_against_the_black = True
