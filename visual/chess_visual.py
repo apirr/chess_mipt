@@ -1,4 +1,5 @@
-from PIL import Image
+from PIL import Image, ImageFile
+ImageFile.LOAD_TRUNCATED_IMAGES = True
 
 
 def resized_chess_piece_image(where_to_paste_image: Image, what_to_paste_image: Image):
