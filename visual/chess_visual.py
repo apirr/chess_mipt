@@ -41,14 +41,15 @@ class Drawer:
         return ingame_board_image_filename
 
     def make_board_for_print(self):
-        """Обновляет board_for_print_txt на основе позиций фигур, хранящихся в board."""
+        """Обновляет board_for_print_png на основе позиций фигур, хранящихся в board."""
 
         'ch_p --- chess_piece'
-        for ch_p in self.board:
-            if ch_p.type != 'empty' and not ch_p.dead:
-                with Image.open(f'Visual/images/wikipedia/{ch_p.color + ch_p.type}.png') as ch_p_image:
-                    ch_p_image = resized_chess_piece_image(self.board_for_print_png, ch_p_image)
-                    paste_box = paste_box_creator(ch_p, ch_p_image)
-                    self.board_for_print_png.paste(ch_p_image, paste_box, mask=ch_p_image)
-                    self.board_for_print_png.save('visual/images/ingame.png')
-                self.board_for_print_png = Image.open('visual/images/ingame.png')
+        for row in self.board:
+            for ch_p in row:
+                if ch_p.type != 'empty' and not ch_p.dead:
+                    with Image.open(f'Visual/images/wikipedia/{ch_p.color + ch_p.type}.png') as ch_p_image:
+                        ch_p_image = resized_chess_piece_image(self.board_for_print_png, ch_p_image)
+                        paste_box = paste_box_creator(ch_p, ch_p_image)
+                        self.board_for_print_png.paste(ch_p_image, paste_box, mask=ch_p_image)
+                        self.board_for_print_png.save('visual/images/ingame.png')
+                    self.board_for_print_png = Image.open('visual/images/ingame.png')

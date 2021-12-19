@@ -74,7 +74,7 @@ def get_move(message):
                                      board.whose_move_it_is == "white")):
                                 if board.move_this_chess_piece(move_coordinates_creator(message.text)[0], move_coordinates_creator(message.text)[1]):
                                     bot.send_message(message.from_user.id, "принято")
-                                    drawer = Drawer(board.chess_pieces)
+                                    drawer = Drawer(board)
                                     drawer.make_board_for_print()
                                     with open(drawer.bot_print(), 'rb') as photo:
                                         bot.send_photo(message.from_user.id, photo)
@@ -96,7 +96,7 @@ def wait_for_move(message):
             or
             (message.from_user.id == board.white_id and
             board.whose_move_it_is == "white")):
-                drawer = Drawer(board.chess_pieces)
+                drawer = Drawer(board)
                 drawer.make_board_for_print()
                 with open(drawer.bot_print(), 'rb') as photo:
                     bot.send_photo(message.from_user.id, photo)
@@ -126,3 +126,4 @@ def move_coordinates_creator(move):
     return start_position, finish_position
 
 bot.polling(none_stop=True, interval=0)
+print(move_coordinates_creator('e2 e4'))
