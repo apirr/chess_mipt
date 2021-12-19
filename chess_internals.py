@@ -61,7 +61,7 @@ class Chess_piece:
 	def can_it_go_there(self, target_position):
 		# НЕ РАБОТАЕТ ДЛЯ ПЕШЕК. РОКИРОВКИ ТОЖЕ НЕ ТУТ проверяет находится ли точка на которую хотим сходить. 
 		# НЕЛЬЗЯ ИСПОЛЬЗОВАТЬ ЭТОТ МЕТОД ЕСЛИ ВЫ НЕ ПОНИМАЕТЕ ЧТО ТВОРИТЕ С ЭТИМ МЕТОДОМ. ИСПОЛЬЗУЙТЕ МЕТОД В КЛАССЕ BOARD
-		assert self.type != 'P'
+		# assert self.type != 'P'
 		can_it_go_there = False
 		if not self.is_in_bounds(target_position):
 			return False
@@ -134,14 +134,14 @@ class Board(Chess_piece):
 
 		if(moving_figure.position == 'empty'):
 			return False
-		if self.moving_figure.can_it_go_there(target_position) == False:
-			return False
+		#if moving_figure.can_it_go_there(target_position) == False:
+			#return False
 
-		move_vector = [target_position[0] - self.position[0], target_position[1] - self.position[1]]
+		move_vector = [target_position[0] - initial_position[0], target_position[1] - initial_position[1]]
 
 		#этот кусок кода проверяет, как может есть пешка, если ходящая фигура пешка
 
-		if(moving_figure.type == "P" and self.chess_pieces[initial_position].color == 'w' and resulting_figure.color == 'b'): 
+		if(moving_figure.type == "P" and self.chess_pieces[initial_position[0]][initial_position[1]].color == 'w' and resulting_figure.color == 'b'): 
 			if ([moving_figure.position + 1, moving_figure.position + 1] == target_position) and (self.chess_pieces[target_position[0]][target_position[1]].position != 'empty'):
 				return True
 			elif ([moving_figure.position - 1, moving_figure.position + 1] == target_position) and (resulting_figure.position != 'empty'):
@@ -156,12 +156,12 @@ class Board(Chess_piece):
 		elif(resulting_figure.type == 'K'):
 			return 'You cannot eat the king'
 		else:
-			return moving_figure.can_it_go_there[target_position]
+			return moving_figure.can_it_go_there(target_position)
 
 	def is_this_move_pseudo_legal_with_interruptions(self, initial_position, target_position):
 		moving_figure = self.chess_pieces[initial_position[0]][initial_position[1]]
 		resulting_figure = self.chess_pieces[target_position[0]][target_position[1]]
-		move_vector = [target_position[0] - self.position[0], target_position[1] - self.position[1]]
+		move_vector = [target_position[0] - initial_position[0], target_position[1] - initial_position[1]]
 		legality = self.is_this_move_pseudo_legal_without_interruptions(initial_position, target_position)
 		if legality != True:
 			return legality

@@ -5,11 +5,10 @@ from visual.chess_visual import Drawer
 boards = []
 
 
-bot = telebot.TeleBot(input())
+bot = telebot.TeleBot("5018966046:AAH_8hqUJuQbEUJEGYTwNM4U5PK2rvcjfI4")
 @bot.message_handler(content_types=['text'])
 
 def get_start(message):
-    bot.send_message(message.from_user.id, "Напишите Начать игру")
     if message.text == "Начать игру":
         bot.send_message(message.from_user.id, "хотите присоединиться или начать новую?")
         bot.register_next_step_handler(message, password_choose)
@@ -20,11 +19,11 @@ def get_start(message):
 
 def password_choose(message):
     if message.text == "начать новую":
-        bot.register_next_step_handler(message, password_creating)
         bot.send_message(message.from_user.id, "придумайте пароль")
+        bot.register_next_step_handler(message, password_creating)
     elif message.text == "хочу присоединиться" or message.text == "присоединиться":
-        bot.register_next_step_handler(message, password_writing)
         bot.send_message(message.from_user.id, "напишите пароль своего соперника")
+        bot.register_next_step_handler(message, password_writing)
     else:
         bot.send_message(message.from_user.id, "Я тебя не понимаю, напиши Начать игру")
         bot.register_next_step_handler(message, password_choose)
@@ -43,6 +42,7 @@ def password_creating(message):
         boards.append(board)
         while 1:
             if board.black_id != "black":
+                bot.send_message(message.from_user.id, "игра началась")
                 break
         bot.register_next_step_handler(message, get_move)
 
@@ -60,18 +60,20 @@ def password_writing(message):
         bot.register_next_step_handler(message, password_writing)
 
 def get_move(message):
-    if (message.text[0] >= "a" and message.text[0] <= "h"):
-        if (message.text[1] >= "1" and message.text[1] <= "8"):
-            if (message.text[2] == " " or message.text[2] == "-"):
-                if (message.text[3] >= "a" and message.text[3] <= "h"):
-                    if (message.text[1] >= "1" and message.text[1] <= "8"):
+  #  if (message.text[0] >= "a" and message.text[0] <= "h"):
+  #      if (message.text[1] >= "1" and message.text[1] <= "8"):
+  #          if (message.text[2] == " " or message.text[2] == "-"):
+  #              if (message.text[3] >= "a" and message.text[3] <= "h"):
+  #                  if (message.text[1] >= "1" and message.text[1] <= "8"):
+                        bot.send_message(message.from_user.id, "я в муве")
                         for board in boards:
                             if ((message.from_user.id == board.black_id and
                                  board.whose_move_it_is == "black")
                                     or
                                     (message.from_user.id == board.white_id and
                                      board.whose_move_it_is == "white")):
-                                if board.move_this_chess_piece(move_coordinates_creator(message.text)):
+                                if board.move_this_chess_piece(move_coordinates_creator(message.text)[0], move_coordinates_creator(message.text)[1]):
+                                    bot.send_message(message.from_user.id, "принято")
                                     drawer = Drawer(board.chess_pieces)
                                     drawer.make_board_for_print()
                                     with open(drawer.bot_print(), 'rb') as photo:
@@ -79,9 +81,9 @@ def get_move(message):
                                     bot.register_next_step_handler(message, wait_for_move)
                                 else:
                                     bot.send_message(message.from_user.id, "этот ход невозможно сделать")
-                    else:
-                        bot.send_message(message.from_user.id, "это не похоже на ход")
-                        bot.register_next_step_handler(message, get_move)
+     #               else:
+    #                   bot.send_message(message.from_user.id, "это не похоже на ход")
+    #                    bot.register_next_step_handler(message, get_move)
 
 def wait_for_move(message):
     if message.text:
@@ -101,25 +103,26 @@ def wait_for_move(message):
                 bot.register_next_step_handler(message, get_move)
 
 def move_coordinates_creator(move):
+    mas = []
     for i in [0, 3]:
         if move[i] == 'a':
-            move[i] = 0
+            mas.append(0)
         if move[i] == 'b':
-            move[i] = 1
+            mas.append(1)
         if move[i] == 'c':
-            move[i] = 2
+            mas.append(2)
         if move[i] == 'd':
-            move[i] = 3
+            mas.append(3)
         if move[i] == 'e':
-            move[i] = 4
+            mas.append(4)
         if move[i] == 'f':
-            move[i] = 5
+            mas.append(5)
         if move[i] == 'g':
-            move[i] = 6
+            mas.append(6)
         if move[i] == 'h':
-            move[i] = 7
-    start_position = [move[0], move[1] - 1]
-    finish_position = [move[3], move[4] - 1]
+            mas.append(7)
+    start_position = [mas[0], int(move[1]) - 1]
+    finish_position = [mas[1], int(move[4]) - 1]
     return start_position, finish_position
 
 bot.polling(none_stop=True, interval=0)
