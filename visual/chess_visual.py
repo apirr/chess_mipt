@@ -54,6 +54,3 @@ class Drawer:
                     self.board_for_print_png.paste(ch_p_image, paste_box, mask=ch_p_image)
                     self.board_for_print_png.save('visual/images/ingame.png')
                 self.board_for_print_png = Image.open('visual/images/ingame.png')
-
-    def cleaner(self):
-        remove('visual/images/ingame.png')
