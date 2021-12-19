@@ -80,15 +80,15 @@ def get_move(message):
       bot.send_message(message.from_user.id, "я в муве")
       for board in boards:
         if ((message.from_user.id == board.black_id and
-            board.whose_move_it_is == "black")
+            board.whose_move_it_is == "b")
             or
             (message.from_user.id == board.white_id and
-            board.whose_move_it_is == "white")):
+            board.whose_move_it_is == "w")):
                 if board.move_this_chess_piece(move_coordinates_creator(message.text)[0], move_coordinates_creator(message.text)[1]):
-                    if board.whose_move_it_is == 'white':
-                        board.whose_move_it_is = 'black'
+                    if board.whose_move_it_is == 'w':
+                        board.whose_move_it_is = 'b'
                     else:
-                        board.whose_move_it_is = 'white'
+                        board.whose_move_it_is = 'w'
                     bot.send_message(message.from_user.id, "принято"+' '+board.whose_move_it_is)
                     drawer = Drawer(board)
                     drawer.make_board_for_print()
@@ -112,10 +112,10 @@ def wait(message):
         if flag:
             for board in boards:
                 if ((message.from_user.id == board.black_id and
-                board.whose_move_it_is == "black")
+                board.whose_move_it_is == "b")
                 or
                 (message.from_user.id == board.white_id and
-                board.whose_move_it_is == "white")):
+                board.whose_move_it_is == "w")):
                     drawer = Drawer(board)
                     drawer.make_board_for_print()
                     with open(drawer.bot_print(), 'rb') as photo:
