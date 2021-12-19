@@ -69,11 +69,9 @@ class Chess_piece:
 
 		move_vector = [target_position[0] - self.position[0],
 					   target_position[1] - self.position[1]]
-		print(move_vector)
 		for v in vector_set:
 			if v == move_vector:
 				can_it_go_there = True
-			else: print('fuck')
 		return can_it_go_there
 	def return_a_unit_vector(self, vector):
 		'''Возвращает единичный вектор в ту сторону, в которую хочется сходить. Нужно, чтобы итеративно проверить не стоит ли кого на пути. Принимает на вход вектор.'''
@@ -112,14 +110,14 @@ class Board(Chess_piece):
 		self.chess_pieces[5][0] = Chess_piece('B', 'w', [5, 0])
 		self.chess_pieces[6][0] = Chess_piece('N', 'w', [6, 0])
 		self.chess_pieces[7][0] = Chess_piece('R', 'w', [7, 0])
-		self.chess_pieces[0][7] = Chess_piece('R', 'w', [0, 0])
-		self.chess_pieces[1][7] = Chess_piece('N', 'w', [1, 0])
-		self.chess_pieces[2][7] = Chess_piece('B', 'w', [2, 0])
-		self.chess_pieces[3][7] = Chess_piece('K', 'w', [3, 0])
-		self.chess_pieces[4][7] = Chess_piece('Q', 'w', [4, 0])
-		self.chess_pieces[5][7] = Chess_piece('B', 'w', [5, 0])
-		self.chess_pieces[6][7] = Chess_piece('N', 'w', [6, 0])
-		self.chess_pieces[7][7] = Chess_piece('R', 'w', [7, 0])
+		self.chess_pieces[0][7] = Chess_piece('R', 'b', [0, 7])
+		self.chess_pieces[1][7] = Chess_piece('N', 'b', [1, 7])
+		self.chess_pieces[2][7] = Chess_piece('B', 'b', [2, 7])
+		self.chess_pieces[3][7] = Chess_piece('Q', 'b', [3, 7])
+		self.chess_pieces[4][7] = Chess_piece('K', 'b', [4, 7])
+		self.chess_pieces[5][7] = Chess_piece('B', 'b', [5, 7])
+		self.chess_pieces[6][7] = Chess_piece('N', 'b', [6, 7])
+		self.chess_pieces[7][7] = Chess_piece('R', 'b', [7, 7])
 		self.black_id = 'black'
 		self.white_id = white_id
 		self.game_password = game_password
@@ -144,23 +142,23 @@ class Board(Chess_piece):
 		#этот кусок кода проверяет, как может есть пешка, если ходящая фигура пешка
 
 		if(moving_figure.type == "P" and self.chess_pieces[initial_position[0]][initial_position[1]].color == 'w' and resulting_figure.color == 'b'): 
-			if ([moving_figure.position + 1, moving_figure.position + 1] == target_position) and (self.chess_pieces[target_position[0]][target_position[1]].position != 'empty'):
+			if ([moving_figure.position[0] + 1, moving_figure.position[1] + 1] == target_position) and (self.chess_pieces[target_position[0]][target_position[1]].position != 'empty'):
 				return True
-			elif ([moving_figure.position - 1, moving_figure.position + 1] == target_position) and (resulting_figure.position != 'empty'):
+			elif ([moving_figure.position[0] - 1, moving_figure.position[1] + 1] == target_position) and (resulting_figure.position != 'empty'):
 				return True
 		elif(moving_figure.type == "P" and self.chess_pieces[initial_position[0]][initial_position[1]].color == 'w' and resulting_figure.color == 'empty' and move_vector == [0, 2]):
 			return True
 		elif(moving_figure.type == "P" and self.chess_pieces[initial_position[0]][initial_position[1]].color == 'b' and resulting_figure.color == 'empty' and move_vector == [0, -2]):
 			return True				
 		elif(moving_figure.type == "P" and moving_figure.color == 'b' and resulting_figure.color == 'w'):
-			if ([moving_figure.position + 1, moving_figure.position - 1] == target_position) and (resulting_figure.position != 'empty'):
+			if ([moving_figure.position[0] + 1, moving_figure.position[1] - 1] == target_position) and (resulting_figure.position != 'empty'):
 				return True
-			elif ([moving_figure.position - 1, moving_figure.position - 1] == target_position) and (self.chess_pieces[target_position[0]][target_position[1]].position != 'empty'): # тут кончается кусок кода с проверкой на пешку
+			elif ([moving_figure.position[0] - 1, moving_figure.position[1] - 1] == target_position) and (self.chess_pieces[target_position[0]][target_position[1]].position != 'empty'): # тут кончается кусок кода с проверкой на пешку
 				return True			
 		elif(moving_figure.type == "R" and moving_figure.have_i_moved == False and resulting_figure.type == 'K' and resulting_figure.have_i_moved == False):
 			return 'Рокировка возможна'
-		elif(resulting_figure.type == 'K'):
-			return 'You cannot eat the king'
+		# elif(resulting_figure.type == 'K'):
+		# 	return 'You cannot eat the king'
 		else:
 			return moving_figure.can_it_go_there(target_position)
 
@@ -175,11 +173,12 @@ class Board(Chess_piece):
 			if moving_figure.type == 'P' or moving_figure.type == 'N':
 				return legality
 			unit_vector = moving_figure.return_a_unit_vector(move_vector)
+			print(unit_vector)
 			iterating_vector = unit_vector
 		# кусок кода далее проверяет, можно ли так походить, проверяя можно ли так походить на каждую клетку по прямой соединяющей начальную и конечную точки
-			while(iterating_vector != unit_vector and (abs(iterating_vector[0])+abs(iterating_vector[1]) < 200)): #второе условие на всякий случай -- если вдруг все пойдет неправильно чтобы цикл не стал бесконечным 
+			while(iterating_vector != move_vector and (abs(iterating_vector[0])+abs(iterating_vector[1]) < 200)): #второе условие на всякий случай -- если вдруг все пойдет неправильно чтобы цикл не стал бесконечным 
 				temporary_target_position = [initial_position[0] + iterating_vector[0], initial_position[1] + iterating_vector[1]]
-				if self.is_this_move_pseudo_legal_without_interruptions(initial_position, temporary_target_position) != True:
+				if self.chess_pieces[temporary_target_position[0]][temporary_target_position[1]].type != 'empty':
 					return False
 				else:
 					iterating_vector = [iterating_vector[0] + unit_vector[0], iterating_vector[1] + unit_vector[1]]
@@ -223,10 +222,12 @@ class Board(Chess_piece):
 		if self.whose_move_it_is == 'white':
 			for arrays in self.chess_pieces:
 				for el in arrays:
-					if el.color == 'white' and self.is_this_move_pseudo_legal_without_interruptions(el.position, black_king.position) == 'You cannot eat the king':
+					if el.color == 'w' and self.is_this_move_pseudo_legal_with_interruptions(el.position, black_king.position) == True:
 						check_against_the_black = True
-					if el.color == 'black' and self.is_this_move_pseudo_legal_without_interruptions(el.position, black_king.position) == 'You cannot eat the king':
+						print(el.position, 'AGAINSTBLACK')
+					if el.color == 'b' and self.is_this_move_pseudo_legal_with_interruptions(el.position, white_king.position) == True:
 						check_against_the_white = True
+						print(el.position, 'AGAINSTW')
 		self.chess_pieces = backup
 		return [check_against_the_white, check_against_the_black]
 
@@ -234,12 +235,17 @@ class Board(Chess_piece):
 	def is_this_move_legal(self, initial_position, target_position):
 		legality = self.is_this_move_pseudo_legal_with_interruptions(initial_position, target_position)
 		check = self.is_it_a_check(initial_position, target_position)
+		check = [False, False]
 		if self.whose_move_it_is == 'white':
 			check = check[0]
 		else:
 			check = check[1]
-		if legality != True or check == True:
-			return False
+		if self.chess_pieces[target_position[0]][target_position[1]].type == "K":
+			return "Нельзя есть короля."
+		if check == True:
+			return "Под шахом следующий ход должен снимать шах. Есть три попытки выйти из-под шаха. После этого объявляется мат."
+		if legality != True:
+			return "Так нельзя ходить."
 		else:
 		 return True
 
@@ -252,17 +258,7 @@ class Board(Chess_piece):
 			return True
 
 
-# brd = Board('oeirj', 'wiufn')
 
-# for arr in brd.chess_pieces:
-# 	for el in arr:
-# 		print(el.type, end =" ")
-# 	print('\n')
-# print(brd.move_this_chess_piece([4, 1], [4, 3])) 
-# for arr in brd.chess_pieces:
-# 	for el in arr:
-# 		print(el.type, end =" ")
-# 	print('\n')
 
 
 
