@@ -57,7 +57,8 @@ def password_writing(message):
             flag = False
             bot.send_message(message.from_user.id, "пароль найден вы играете за черных")
             board.black_id = message.from_user.id
-            bot.register_next_step_handler(message, wait_for_move)
+            wait(message)
+            #bot.register_next_step_handler(message, wait_for_move)
             break
     if flag:
         bot.send_message(message.from_user.id, "пароль не найден попробуйте еще раз")
@@ -82,17 +83,16 @@ def get_move(message):
                                     drawer.make_board_for_print()
                                     with open(drawer.bot_print(), 'rb') as photo:
                                         bot.send_photo(message.from_user.id, photo)
-                                    bot.register_next_step_handler(message, wait_for_move)
+                                    wait(message)
+                                    #bot.register_next_step_handler(message, wait_for_move)
                                 else:
                                     bot.send_message(message.from_user.id, "этот ход невозможно сделать")
+                                    bot.register_next_step_handler(message, get_move)
      #               else:
     #                   bot.send_message(message.from_user.id, "это не похоже на ход")
     #                    bot.register_next_step_handler(message, get_move)
 
-def wait_for_move(message):
-    if message.text:
-        bot.send_message(message.from_user.id, "Ждите пока сходит ваш соперник")
-        bot.register_next_step_handler(message, wait_for_move)
+def wait(message):
     while 1:
         for board in boards:
             if ((message.from_user.id == board.black_id and
@@ -104,7 +104,27 @@ def wait_for_move(message):
                 drawer.make_board_for_print()
                 with open(drawer.bot_print(), 'rb') as photo:
                     bot.send_photo(message.from_user.id, photo)
+                bot.send_message(message.from_user.id, "ходите")
                 bot.register_next_step_handler(message, get_move)
+
+'''
+def wait_for_move(message):
+    if message.text and tmp == 0:
+        bot.send_message(message.from_user.id, "Ждите пока сходит ваш соперник")
+        tmp += 1
+    for board in boards:
+        if ((message.from_user.id == board.black_id and
+        board.whose_move_it_is == "black")
+        or
+        (message.from_user.id == board.white_id and
+        board.whose_move_it_is == "white")):
+            drawer = Drawer(board)
+            drawer.make_board_for_print()
+            with open(drawer.bot_print(), 'rb') as photo:
+                    bot.send_photo(message.from_user.id, photo)
+            bot.register_next_step_handler(message, get_move
+                                           
+                                           '''
 
 def move_coordinates_creator(move):
     mas = []
