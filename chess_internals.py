@@ -126,7 +126,7 @@ class Board(Chess_piece):
 		self.black_id = 'black'
 		self.white_id = white_id
 		self.game_password = game_password
-		self.whose_move_it_is = 'white' #меняйте после каждого успешного хода
+		self.whose_move_it_is = 'w' #меняйте после каждого успешного хода
 		self.is_there_a_check_against_the_white = False
 		self.is_there_a_check_against_the_black = False
 
@@ -138,6 +138,8 @@ class Board(Chess_piece):
 		resulting_figure = self.chess_pieces[target_position[0]][target_position[1]]
 
 		if(moving_figure.position == 'empty'):
+			return False
+		if(moving_figure.color != self.whose_move_it_is):
 			return False
 		#if moving_figure.can_it_go_there(target_position) == False:
 			#return False
