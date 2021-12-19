@@ -130,4 +130,3 @@ def move_coordinates_creator(move):
     return start_position, finish_position
 
 bot.polling(none_stop=True, interval=0)
-print(move_coordinates_creator('e2 e4'))
