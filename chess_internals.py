@@ -4,7 +4,10 @@ GLOBAL_CHESS_PIECES_MOVES = {
 	'B': [[1, 1], [-1, -1], [2, 2], [-2, -2], [3, 3], [-3, -3], [4, 4], [-4, -4], [5, 5], [-5, -5], [6, 6], [-6, -6], [7, 7], [-7, -7], [1, -1], [-1, 1], [2, -2], [-2, 2], [3, -3], [-3, 3], [4, -4], [-4, 4], [5, -5], [-5, 5], [6, -6], [-6, 6], [7, -7], [-7, 7]],
 	'Q': [[0, 0], [0, 0], [0, 0], [0, 0], [0, 1], [1, 0], [-1, 0], [0, -1], [0, 2], [2, 0], [-2, 0], [0, -2], [0, 3], [3, 0], [-3, 0], [0, -3], [0, 4], [4, 0], [-4, 0], [0, -4], [0, 5], [5, 0], [-5, 0], [0, -5], [0, 6], [6, 0], [-6, 0], [0, -6], [0, 7], [7, 0], [-7, 0], [0, -7], [1, 1], [-1, -1], [2, 2], [-2, -2], [3, 3], [-3, -3], [4, 4], [-4, -4], [5, 5], [-5, -5], [6, 6], [-6, -6], [7, 7], [-7, -7], [1, -1], [-1, 1], [2, -2], [-2, 2], [3, -3], [-3, 3], [4, -4], [-4, 4], [5, -5], [-5, 5], [6, -6], [-6, 6], [7, -7], [-7, 7]],
 	'N': [[2, 1], [1, 2], [-2, -1], [-1, -2], [-1, 2], [1, -2], [2, -1], [-2, 1]],
-	'P': [[0, 1], [1, 1], [-1, 1]]
+	# 'Pw': [[0, 1], [1, 1], [-1, 1]],
+	# 'Pb': [[0, -1], [-1, -1], [1, -1]]
+	'Pw': [[0, 1]],
+	'Pb': [[0, -1]]
 }
 
 def sign(x):
@@ -48,7 +51,10 @@ class Chess_piece:
 		'''
 		Возвращает возможные векторы перемещения для этой фигуры (принципиально возможные)
 		'''
-		return GLOBAL_CHESS_PIECES_MOVES.get(self.type)
+		if self.type != "P":
+			return GLOBAL_CHESS_PIECES_MOVES.get(self.type)
+		else:
+			return GLOBAL_CHESS_PIECES_MOVES.get(self.type + self.color)
 
 	def is_dead(self):
 		return self.dead  
@@ -66,7 +72,6 @@ class Chess_piece:
 		if not self.is_in_bounds(target_position):
 			return False
 		vector_set = self.move_vectors()
-
 		move_vector = [target_position[0] - self.position[0],
 					   target_position[1] - self.position[1]]
 		for v in vector_set:
@@ -100,8 +105,8 @@ class Board(Chess_piece):
 			for j in range(8):
 				self.chess_pieces[i][j] = Chess_piece()
 		for i in range(8):
-			self.chess_pieces[i][1] = Chess_piece('P', 'w', [i, 1])
-			self.chess_pieces[i][6] = Chess_piece('P', 'b', [i, 6])
+			self.chess_pieces[i][1] = Chess_piece('P', 'w', [int(i), 1])
+			self.chess_pieces[i][6] = Chess_piece('P', 'b', [int(i), 6])
 		self.chess_pieces[0][0] = Chess_piece('R', 'w', [0, 0])
 		self.chess_pieces[1][0] = Chess_piece('N', 'w', [1, 0])
 		self.chess_pieces[2][0] = Chess_piece('B', 'w', [2, 0])
@@ -173,7 +178,6 @@ class Board(Chess_piece):
 			if moving_figure.type == 'P' or moving_figure.type == 'N':
 				return legality
 			unit_vector = moving_figure.return_a_unit_vector(move_vector)
-			print(unit_vector)
 			iterating_vector = unit_vector
 		# кусок кода далее проверяет, можно ли так походить, проверяя можно ли так походить на каждую клетку по прямой соединяющей начальную и конечную точки
 			while(iterating_vector != move_vector and (abs(iterating_vector[0])+abs(iterating_vector[1]) < 200)): #второе условие на всякий случай -- если вдруг все пойдет неправильно чтобы цикл не стал бесконечным 
@@ -224,10 +228,8 @@ class Board(Chess_piece):
 				for el in arrays:
 					if el.color == 'w' and self.is_this_move_pseudo_legal_with_interruptions(el.position, black_king.position) == True:
 						check_against_the_black = True
-						print(el.position, 'AGAINSTBLACK')
 					if el.color == 'b' and self.is_this_move_pseudo_legal_with_interruptions(el.position, white_king.position) == True:
 						check_against_the_white = True
-						print(el.position, 'AGAINSTW')
 		self.chess_pieces = backup
 		return [check_against_the_white, check_against_the_black]
 
@@ -260,7 +262,18 @@ class Board(Chess_piece):
 
 # brd = Board('oieef', 'uinfui')
 
-# print(brd.is_this_move_legal([1, 0], [0,2]))
+# # print(brd.is_this_move_legal([1, 6], [2,5]))
+# print(brd.move_this_chess_piece([1, 6], [1,4]))
+# print(brd.move_this_chess_piece([1,4], [1,3]))
+# print(brd.move_this_chess_piece([1,3], [1,2]))
+# print(brd.move_this_chess_piece([1,2], [0,1]))
+
+
+# for array in brd.chess_pieces:
+# 	for el in array:
+# 		print(el.type, end = ' ')
+# 	print('\n')
+#(brd.chess_pieces[1][6].can_it_go_there([1, 4]))
 
 
 
