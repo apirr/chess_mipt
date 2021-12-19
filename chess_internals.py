@@ -157,10 +157,10 @@ class Board(Chess_piece):
 				return True			
 		elif(moving_figure.type == "R" and moving_figure.have_i_moved == False and resulting_figure.type == 'K' and resulting_figure.have_i_moved == False):
 			return 'Рокировка возможна'
-		# elif(resulting_figure.type == 'K'):
-		# 	return 'You cannot eat the king'
+		elif moving_figure.color == resulting_figure.color:
+			return False
 		else:
-			return moving_figure.can_it_go_there(target_position)
+			return moving_figure.can_it_go_there(target_position) 
 
 	def is_this_move_pseudo_legal_with_interruptions(self, initial_position, target_position):
 		moving_figure = self.chess_pieces[initial_position[0]][initial_position[1]]
@@ -262,8 +262,9 @@ class Board(Chess_piece):
 			return True
 
 
+brd = Board('oieef', 'uinfui')
 
-
+print(brd.is_this_move_legal([0, 0], [0,1]))
 
 
 
