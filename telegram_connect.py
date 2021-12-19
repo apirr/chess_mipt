@@ -5,7 +5,7 @@ from visual.chess_visual import Drawer
 boards = []
 
 
-bot = telebot.TeleBot("5018966046:AAH_8hqUJuQbEUJEGYTwNM4U5PK2rvcjfI4")
+bot = telebot.TeleBot(input())
 @bot.message_handler(content_types=['text'])
 
 def get_start(message):
@@ -23,7 +23,7 @@ def password_choose(message):
     if message.text.lower() == "начать новую" or message.text.lower() == "новую":
         bot.send_message(message.from_user.id, "придумайте пароль")
         bot.register_next_step_handler(message, password_creating)
-    elif message.text == "хочу присоединиться" or message.text == "присоединиться":
+    elif message.text.lower() == "хочу присоединиться" or message.text.lower() == "присоединиться":
         bot.send_message(message.from_user.id, "напишите пароль своего соперника")
         bot.register_next_step_handler(message, password_writing)
     else:
@@ -71,25 +71,20 @@ def password_writing(message):
         bot.register_next_step_handler(message, password_writing)
 
 def get_move(message):
-    if((message.text.len() == 5) and
+    if((len(message.text) == 5) and
       (message.text[0] >= "a" and message.text[0] <= "h") and
       (message.text[1] >= "1" and message.text[1] <= "8") and
       (message.text[2] == " " or message.text[2] == "-") and
       (message.text[3] >= "a" and message.text[3] <= "h") and
       (message.text[1] >= "1" and message.text[1] <= "8")):
-      bot.send_message(message.from_user.id, "я в муве")
       for board in boards:
         if ((message.from_user.id == board.black_id and
             board.whose_move_it_is == "b")
             or
             (message.from_user.id == board.white_id and
             board.whose_move_it_is == "w")):
-                if board.move_this_chess_piece(move_coordinates_creator(message.text)[0], move_coordinates_creator(message.text)[1]):
-                    if board.whose_move_it_is == 'w':
-                        board.whose_move_it_is = 'b'
-                    else:
-                        board.whose_move_it_is = 'w'
-                    bot.send_message(message.from_user.id, "принято"+' '+board.whose_move_it_is)
+                if board.move_this_chess_piece(move_coordinates_creator(message.text.lower())[0], move_coordinates_creator(message.text.lower())[1]):
+                    bot.send_message(message.from_user.id, "принято")
                     drawer = Drawer(board)
                     drawer.make_board_for_print()
                     with open(drawer.bot_print(), 'rb') as photo:
@@ -106,7 +101,6 @@ def get_move(message):
         bot.register_next_step_handler(message, get_move)
 
 def wait(message):
-    bot.send_message(message.from_user.id, 'я вейт')
     flag = True
     while 1:
         if flag:
@@ -125,26 +119,6 @@ def wait(message):
                     break
         else:
             break
-
-
-'''
-def wait_for_move(message):
-    if message.text and tmp == 0:
-        bot.send_message(message.from_user.id, "Ждите пока сходит ваш соперник")
-        tmp += 1
-    for board in boards:
-        if ((message.from_user.id == board.black_id and
-        board.whose_move_it_is == "black")
-        or
-        (message.from_user.id == board.white_id and
-        board.whose_move_it_is == "white")):
-            drawer = Drawer(board)
-            drawer.make_board_for_print()
-            with open(drawer.bot_print(), 'rb') as photo:
-                    bot.send_photo(message.from_user.id, photo)
-            bot.register_next_step_handler(message, get_move
-                                           
-                                           '''
 
 def move_coordinates_creator(move):
     mas = []
@@ -169,4 +143,4 @@ def move_coordinates_creator(move):
     finish_position = [mas[1], int(move[4]) - 1]
     return start_position, finish_position
 
-bot.polling(none_stop=True, interval=0)
+bot.polling(none_stop=False, interval=4)
