@@ -58,6 +58,7 @@ def password_writing(message):
             bot.send_message(message.from_user.id, "пароль найден вы играете за черных")
             board.black_id = message.from_user.id
             wait(message)
+            bot.register_next_step_handler(message, get_move)
             #bot.register_next_step_handler(message, wait_for_move)
             break
     if flag:
@@ -72,18 +73,16 @@ def get_move(message):
   #                  if (message.text[1] >= "1" and message.text[1] <= "8"):
                         bot.send_message(message.from_user.id, "я в муве")
                         for board in boards:
-                            if ((message.from_user.id == board.black_id and
-                                 board.whose_move_it_is == "black")
-                                    or
-                                    (message.from_user.id == board.white_id and
-                                     board.whose_move_it_is == "white")):
+                            if ((message.from_user.id == board.black_id and board.whose_move_it_is == "black") or (message.from_user.id == board.white_id and board.whose_move_it_is == "white")):
                                 if board.move_this_chess_piece(move_coordinates_creator(message.text)[0], move_coordinates_creator(message.text)[1]):
                                     bot.send_message(message.from_user.id, "принято")
                                     drawer = Drawer(board)
                                     drawer.make_board_for_print()
                                     with open(drawer.bot_print(), 'rb') as photo:
                                         bot.send_photo(message.from_user.id, photo)
+                                    bot.send_message(message.from_user.id, board.whose_move_it_is)
                                     wait(message)
+                                    bot.register_next_step_handler(message, get_move)
                                     #bot.register_next_step_handler(message, wait_for_move)
                                 else:
                                     bot.send_message(message.from_user.id, "этот ход невозможно сделать")
@@ -105,7 +104,10 @@ def wait(message):
                 with open(drawer.bot_print(), 'rb') as photo:
                     bot.send_photo(message.from_user.id, photo)
                 bot.send_message(message.from_user.id, "ходите")
-                bot.register_next_step_handler(message, get_move)
+                break
+            break
+        break
+
 
 '''
 def wait_for_move(message):
