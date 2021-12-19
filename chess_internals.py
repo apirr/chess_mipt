@@ -95,13 +95,13 @@ class Board(Chess_piece):
 
 	'''
 	def __init__(self, white_id, game_password):
-		self.chess_pieces = [[1]*8]*8
+		self.chess_pieces = [[1]*8, [1]*8, [1]*8, [1]*8, [1]*8, [1]*8, [1]*8, [1]*8]
 		for i in range(8):
 			for j in range(8):
 				self.chess_pieces[i][j] = Chess_piece()
 		for i in range(8):
 			self.chess_pieces[i][1] = Chess_piece('P', 'w', [i, 1])
-			self.chess_pieces[i][6] = Chess_piece('P', 'b', [i, 1])
+			self.chess_pieces[i][6] = Chess_piece('P', 'b', [i, 6])
 		self.chess_pieces[0][0] = Chess_piece('R', 'w', [0, 0])
 		self.chess_pieces[1][0] = Chess_piece('N', 'w', [1, 0])
 		self.chess_pieces[2][0] = Chess_piece('B', 'w', [2, 0])
@@ -236,6 +236,9 @@ class Board(Chess_piece):
 		else:
 			self.pseudo_move_this_chess_piece(initial_position, target_position)
 			return True
+
+
+
 
 
 
