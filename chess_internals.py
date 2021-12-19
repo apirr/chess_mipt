@@ -291,21 +291,21 @@ class Board(Chess_piece):
 			return True
 
 
-brd = Board('oieef', 'uinfui')
+# brd = Board('oieef', 'uinfui')
 
-brd.move_this_chess_piece([4, 1], [4, 3])
-brd.move_this_chess_piece([3, 0], [6, 3])
-brd.move_this_chess_piece([2,1], [2,3])
-brd.move_this_chess_piece([3,1], [3,3])
-brd.move_this_chess_piece([2,0], [5,3])
-brd.move_this_chess_piece([1,0], [3, 1])
-print(brd.pseudo_move_this_chess_piece([0,0], [4, 0])) 
+# brd.move_this_chess_piece([4, 1], [4, 3])
+# brd.move_this_chess_piece([3, 0], [6, 3])
+# brd.move_this_chess_piece([2,1], [2,3])
+# brd.move_this_chess_piece([3,1], [3,3])
+# brd.move_this_chess_piece([2,0], [5,3])
+# brd.move_this_chess_piece([1,0], [3, 1])
+# print(brd.pseudo_move_this_chess_piece([0,0], [4, 0])) 
 
 
 # print(brd.is_it_a_check([4, 0], [4,1]))
 # print(brd.is_this_move_pseudo_legal_with_interruptions([4,0], [4,1]))
 
-pr_br(brd)
+# pr_br(brd)
 
 
 # # print(brd.is_this_move_legal([1, 6], [2,5]))
