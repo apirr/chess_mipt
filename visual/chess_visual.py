@@ -1,4 +1,4 @@
-from PIL import Image, ImageFile
+from PIL import ImageFile, Image
 ImageFile.LOAD_TRUNCATED_IMAGES = True
 
 
@@ -53,8 +53,6 @@ class Drawer:
                         paste_box = paste_box_creator(ch_p, ch_p_image)
                         self.board_for_print_png.paste(ch_p_image, paste_box, mask=ch_p_image)
                         self.board_for_print_png.save('visual/images/ingame.png')
-                    try:
                         self.board_for_print_png = Image.open('visual/images/ingame.png')
-                    except:
-                        self.board_for_print_png = Image.open('visual/images/chessboard.png')
+
 
