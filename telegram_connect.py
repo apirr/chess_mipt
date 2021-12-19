@@ -73,7 +73,11 @@ def get_move(message):
   #                  if (message.text[1] >= "1" and message.text[1] <= "8"):
                         bot.send_message(message.from_user.id, "я в муве")
                         for board in boards:
-                            if ((message.from_user.id == board.black_id) or (message.from_user.id == board.white_id)):
+                            if ((message.from_user.id == board.black_id and
+                                 board.whose_move_it_is == "black")
+                                    or
+                                    (message.from_user.id == board.white_id and
+                                     board.whose_move_it_is == "white")):
                                 if board.move_this_chess_piece(move_coordinates_creator(message.text)[0], move_coordinates_creator(message.text)[1]):
                                     if board.whose_move_it_is == 'white':
                                         board.whose_move_it_is = 'black'
