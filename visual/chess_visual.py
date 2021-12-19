@@ -34,52 +34,26 @@ class Drawer:
         self.board = board.chess_pieces
         self.board_for_print_txt = [[['**'] for i in range(8)] for i in range(8)]
         self.board_for_print_png = Image.open('visual/images/chessboard.png')
-        self.print_type = 'none'
 
     def bot_print(self):
-        """Make board image for user. Board image can be a string or a .png file.
-        :return: board image in chosen format or request to choose format"""
-        if self.print_type == 'text':
-            print_string = ''
-            for row in self.board_for_print_txt:
-                for cell in row:
-                    if cell is row[7]:
-                        print_string = print_string + cell[0] + '\n'
-                    else:
-                        print_string = print_string + cell[0] + ' '
-            return print_string
-        elif self.print_type == 'image':
-            ingame_board_image_filename = self.board_for_print_png.filename
-            self.board_for_print_png = Image.open('visual/images/chessboard.png')
-            return ingame_board_image_filename
-        elif self.print_type == 'none':
-            'Можно убрать этот пункт, если перед началом партии просить выбрать юзера формат вывода шахматной доски'
-            return 'Please choose board image type: text or image'
-        else:
-            return f'Chosen board image type <<{self.print_type}>> is not supported. ' \
-                   f'Please choose board image type: text or image'
+        """Make board image for user.
+        :return: board image"""
+        ingame_board_image_filename = self.board_for_print_png.filename
+        self.board_for_print_png = Image.open('visual/images/chessboard.png')
+        return ingame_board_image_filename
 
-    def make_board_for_print(self, print_type):
-        """Обновляет board_for_print_txt на основе позиций фигур, хранящихся в board.
-        print_type = 'text' or 'image' """
+    def make_board_for_print(self):
+        """Обновляет board_for_print_txt на основе позиций фигур, хранящихся в board."""
 
         'ch_p --- chess_piece'
-
-        if print_type == 'text':
-            for ch_p in self.board:
-                self.board_for_print_txt[7 - ch_p.position[1]][ch_p.position[0]][0] = ch_p.color + ch_p.type
-            self.print_type = 'text'
-        elif print_type == 'image':
-            for ch_p in self.board:
+        for ch_p in self.board:
+            if ch_p.type != 'empty' and not ch_p.dead:
                 with Image.open(f'Visual/images/wikipedia/{ch_p.color + ch_p.type}.png') as ch_p_image:
                     ch_p_image = resized_chess_piece_image(self.board_for_print_png, ch_p_image)
                     paste_box = paste_box_creator(ch_p, ch_p_image)
                     self.board_for_print_png.paste(ch_p_image, paste_box, mask=ch_p_image)
                     self.board_for_print_png.save('visual/images/ingame.png')
                 self.board_for_print_png = Image.open('visual/images/ingame.png')
-            self.print_type = 'image'
-        else:
-            self.print_type = print_type
 
     def cleaner(self):
         remove('visual/images/ingame.png')
