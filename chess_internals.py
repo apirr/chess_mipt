@@ -95,7 +95,29 @@ class Board(Chess_piece):
 
 	'''
 	def __init__(self, white_id, game_password):
-		self.chess_pieces = [Сhess_piece() for i in range(7)]*8
+		self.chess_pieces = []
+		for i in range(8):
+			self.chess_pieces.append([Сhess_piece() for i in range(7)])
+		for i in range(8):
+			self.chess_pieces[i][1] = Chess_piece('P', 'w', [i, 1])
+			self.chess_pieces[i][6] = Chess_piece('P', 'b', [i, 1])
+		self.chess_pieces[0][0] = Chess_piece('R', 'w', [0, 0])
+		self.chess_pieces[1][0] = Chess_piece('N', 'w', [1, 0])
+		self.chess_pieces[2][0] = Chess_piece('B', 'w', [2, 0])
+		self.chess_pieces[3][0] = Chess_piece('Q', 'w', [3, 0])
+		self.chess_pieces[4][0] = Chess_piece('K', 'w', [4, 0])
+		self.chess_pieces[5][0] = Chess_piece('B', 'w', [5, 0])
+		self.chess_pieces[6][0] = Chess_piece('N', 'w', [6, 0])
+		self.chess_pieces[7][0] = Chess_piece('R', 'w', [7, 0])
+		self.chess_pieces[0][7] = Chess_piece('R', 'w', [0, 0])
+		self.chess_pieces[1][7] = Chess_piece('N', 'w', [1, 0])
+		self.chess_pieces[2][7] = Chess_piece('B', 'w', [2, 0])
+		self.chess_pieces[3][7] = Chess_piece('K', 'w', [3, 0])
+		self.chess_pieces[4][7] = Chess_piece('Q', 'w', [4, 0])
+		self.chess_pieces[5][7] = Chess_piece('B', 'w', [5, 0])
+		self.chess_pieces[6][7] = Chess_piece('N', 'w', [6, 0])
+		self.chess_pieces[7][7] = Chess_piece('R', 'w', [7, 0])
+
 		black_id = 'black'
 		white_id = 'white'
 		game_password = 'this may not be required' #может быть не надо в зависимости от того как будете реализовывать
