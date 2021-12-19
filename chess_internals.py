@@ -255,10 +255,6 @@ class Board(Chess_piece):
 			return False
 		else:
 			self.pseudo_move_this_chess_piece(initial_position, target_position)
-			if self.whose_move_it_is == 'white':
-				self.whose_move_it_is = 'black'
-			else:
-				self.whose_move_it_is = 'white'
 			return True
 
 

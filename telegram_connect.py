@@ -55,8 +55,8 @@ def password_writing(message):
     for board in boards:
         if message.text == board.game_password:
             flag = False
-            bot.send_message(message.from_user.id, "пароль найден вы играете за черных")
             board.black_id = message.from_user.id
+            bot.send_message(message.from_user.id, str(message.from_user.id)+"пароль найден вы играете за черных"+' '+str(board.white_id)+' '+str(board.black_id))
             wait(message)
             bot.register_next_step_handler(message, get_move)
             #bot.register_next_step_handler(message, wait_for_move)
@@ -73,9 +73,13 @@ def get_move(message):
   #                  if (message.text[1] >= "1" and message.text[1] <= "8"):
                         bot.send_message(message.from_user.id, "я в муве")
                         for board in boards:
-                            if ((message.from_user.id == board.black_id and board.whose_move_it_is == "black") or (message.from_user.id == board.white_id and board.whose_move_it_is == "white")):
+                            if ((message.from_user.id == board.black_id) or (message.from_user.id == board.white_id)):
                                 if board.move_this_chess_piece(move_coordinates_creator(message.text)[0], move_coordinates_creator(message.text)[1]):
-                                    bot.send_message(message.from_user.id, "принято")
+                                    if board.whose_move_it_is == 'white':
+                                        board.whose_move_it_is = 'black'
+                                    else:
+                                        board.whose_move_it_is = 'white'
+                                    bot.send_message(message.from_user.id, "принято"+' '+board.whose_move_it_is)
                                     drawer = Drawer(board)
                                     drawer.make_board_for_print()
                                     with open(drawer.bot_print(), 'rb') as photo:
@@ -92,21 +96,25 @@ def get_move(message):
     #                    bot.register_next_step_handler(message, get_move)
 
 def wait(message):
+    bot.send_message(message.from_user.id, 'я вейт')
+    flag = True
     while 1:
-        for board in boards:
-            if ((message.from_user.id == board.black_id and
-            board.whose_move_it_is == "black")
-            or
-            (message.from_user.id == board.white_id and
-            board.whose_move_it_is == "white")):
-                drawer = Drawer(board)
-                drawer.make_board_for_print()
-                with open(drawer.bot_print(), 'rb') as photo:
-                    bot.send_photo(message.from_user.id, photo)
-                bot.send_message(message.from_user.id, "ходите")
-                break
+        if flag:
+            for board in boards:
+                if ((message.from_user.id == board.black_id and
+                board.whose_move_it_is == "black")
+                or
+                (message.from_user.id == board.white_id and
+                board.whose_move_it_is == "white")):
+                    drawer = Drawer(board)
+                    drawer.make_board_for_print()
+                    with open(drawer.bot_print(), 'rb') as photo:
+                        bot.send_photo(message.from_user.id, photo)
+                    bot.send_message(message.from_user.id, "ходите")
+                    flag = False
+                    break
+        else:
             break
-        break
 
 
 '''
