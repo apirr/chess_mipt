@@ -69,9 +69,11 @@ class Chess_piece:
 
 		move_vector = [target_position[0] - self.position[0],
 					   target_position[1] - self.position[1]]
+		print(move_vector)
 		for v in vector_set:
 			if v == move_vector:
 				can_it_go_there = True
+			else: print('fuck')
 		return can_it_go_there
 	def return_a_unit_vector(self, vector):
 		'''Возвращает единичный вектор в ту сторону, в которую хочется сходить. Нужно, чтобы итеративно проверить не стоит ли кого на пути. Принимает на вход вектор.'''
@@ -145,7 +147,11 @@ class Board(Chess_piece):
 			if ([moving_figure.position + 1, moving_figure.position + 1] == target_position) and (self.chess_pieces[target_position[0]][target_position[1]].position != 'empty'):
 				return True
 			elif ([moving_figure.position - 1, moving_figure.position + 1] == target_position) and (resulting_figure.position != 'empty'):
-				return True			
+				return True
+		elif(moving_figure.type == "P" and self.chess_pieces[initial_position[0]][initial_position[1]].color == 'w' and resulting_figure.color == 'empty' and move_vector == [0, 2]):
+			return True
+		elif(moving_figure.type == "P" and self.chess_pieces[initial_position[0]][initial_position[1]].color == 'b' and resulting_figure.color == 'empty' and move_vector == [0, -2]):
+			return True				
 		elif(moving_figure.type == "P" and moving_figure.color == 'b' and resulting_figure.color == 'w'):
 			if ([moving_figure.position + 1, moving_figure.position - 1] == target_position) and (resulting_figure.position != 'empty'):
 				return True
@@ -190,10 +196,14 @@ class Board(Chess_piece):
 			moving_figure, resulting_figure = resulting_figure, moving_figure
 			moving_figure.position = target_position
 			resulting_figure.position = initial_position
+			self.chess_pieces[initial_position[0]][initial_position[1]] = moving_figure
+			self.chess_pieces[target_position[0]][target_position[1]] = resulting_figure
+
 		elif is_this_move_legal == True:
-			moving_figure, resulting_figure = resulting_figure, moving_figure
 			moving_figure.position = target_position
 			resulting_figure = Chess_piece()
+			self.chess_pieces[initial_position[0]][initial_position[1]] = Chess_piece()
+			self.chess_pieces[target_position[0]][target_position[1]] = moving_figure
 
 	def is_it_a_check(self, initial_position, target_position):
 		check_against_the_white = False
@@ -204,17 +214,19 @@ class Board(Chess_piece):
 		move = self.pseudo_move_this_chess_piece(initial_position, target_position)
 		white_king = Chess_piece()
 		black_king = Chess_piece()
-		for el in self.chess_pieces:
-			if el.type == 'K' and el.color == 'w':
-				white_king = el
-			elif el.type == 'K' and el.color == 'b':
-				black_king = el
+		for arrays in self.chess_pieces:
+			for el in arrays:
+				if el.type == 'K' and el.color == 'w':
+					white_king = el
+				elif el.type == 'K' and el.color == 'b':
+					black_king = el
 		if self.whose_move_it_is == 'white':
-			for el in self.chess_pieces:
-				if el.color == 'white' and self.is_this_move_pseudo_legal_without_interruptions(el.position, black_king.position) == 'You cannot eat the king':
-					check_against_the_black = True
-				if el.color == 'black' and self.is_this_move_pseudo_legal_without_interruptions(el.position, black_king.position) == 'You cannot eat the king':
-					check_against_the_white = True
+			for arrays in self.chess_pieces:
+				for el in arrays:
+					if el.color == 'white' and self.is_this_move_pseudo_legal_without_interruptions(el.position, black_king.position) == 'You cannot eat the king':
+						check_against_the_black = True
+					if el.color == 'black' and self.is_this_move_pseudo_legal_without_interruptions(el.position, black_king.position) == 'You cannot eat the king':
+						check_against_the_white = True
 		self.chess_pieces = backup
 		return [check_against_the_white, check_against_the_black]
 
@@ -228,6 +240,8 @@ class Board(Chess_piece):
 			check = check[1]
 		if legality != True or check == True:
 			return False
+		else:
+		 return True
 
 	def move_this_chess_piece(self, initial_position, target_position):
 		legality = self.is_this_move_legal(initial_position, target_position)
@@ -238,7 +252,17 @@ class Board(Chess_piece):
 			return True
 
 
+# brd = Board('oeirj', 'wiufn')
 
+# for arr in brd.chess_pieces:
+# 	for el in arr:
+# 		print(el.type, end =" ")
+# 	print('\n')
+# print(brd.move_this_chess_piece([4, 1], [4, 3])) 
+# for arr in brd.chess_pieces:
+# 	for el in arr:
+# 		print(el.type, end =" ")
+# 	print('\n')
 
 
 
