@@ -18,6 +18,8 @@ def get_start(message):
         bot.register_next_step_handler(message, get_start)
 
 def password_choose(message):
+    if message.text.lower() == "вернуться" or message.text.lower() == "назад":
+        bot.register_next_step_handler(message, get_start)
     if message.text.lower() == "начать новую" or message.text.lower() == "новую":
         bot.send_message(message.from_user.id, "придумайте пароль")
         bot.register_next_step_handler(message, password_creating)
@@ -31,22 +33,24 @@ def password_choose(message):
 def password_creating(message):
     if message.text.lower() == "вернуться" or message.text.lower() == "назад":
         bot.register_next_step_handler(message, get_start)
-    flag = True
-    for board in boards:
-        if message.text == board.game_password:
-            flag = False
-            bot.send_message(message.from_user.id, "такой пароль уже существует, придумайте другой")
-            bot.register_next_step_handler(message, password_creating)
-            break
-    if flag:
-        bot.send_message(message.from_user.id, "теперь отправьте этот пароль человеку с которым хотите играть")
-        board = Board(message.from_user.id, message.text)
-        boards.append(board)
-        while 1:
-            if board.black_id != "black":
-                bot.send_message(message.from_user.id, "игра началась")
+    else:
+        flag = True
+        for board in boards:
+            if message.text == board.game_password:
+                flag = False
+                bot.send_message(message.from_user.id, "такой пароль уже существует, придумайте другой")
+                bot.register_next_step_handler(message, password_creating)
                 break
-        bot.register_next_step_handler(message, get_move)
+        if flag:
+            bot.send_message(message.from_user.id, "теперь отправьте этот пароль человеку с которым хотите играть")
+            board = Board(message.from_user.id, message.text)
+            boards.append(board)
+            while 1:
+                if board.black_id != "black":
+                    bot.send_message(message.from_user.id, "игра началась")
+                    bot.send_message(message.from_user.id, "ход пишите в формате e2 e4 или e2-e4")
+                    break
+            bot.register_next_step_handler(message, get_move)
 
 def password_writing(message):
     if message.text.lower() == "вернуться" or message.text.lower() == "назад":
@@ -56,48 +60,50 @@ def password_writing(message):
         if message.text == board.game_password:
             flag = False
             board.black_id = message.from_user.id
-            bot.send_message(message.from_user.id, str(message.from_user.id)+"пароль найден вы играете за черных"+' '+str(board.white_id)+' '+str(board.black_id))
+            bot.send_message(message.from_user.id, "пароль найден вы играете за черных")
+            bot.send_message(message.from_user.id, "не пишите ничего пока не сходит ваш соперник")
             wait(message)
+            bot.send_message(message.from_user.id, "ход пишите в формате e2 e4 или e2-e4")
             bot.register_next_step_handler(message, get_move)
-            #bot.register_next_step_handler(message, wait_for_move)
             break
     if flag:
         bot.send_message(message.from_user.id, "пароль не найден попробуйте еще раз")
         bot.register_next_step_handler(message, password_writing)
 
 def get_move(message):
-  #  if (message.text[0] >= "a" and message.text[0] <= "h"):
-  #      if (message.text[1] >= "1" and message.text[1] <= "8"):
-  #          if (message.text[2] == " " or message.text[2] == "-"):
-  #              if (message.text[3] >= "a" and message.text[3] <= "h"):
-  #                  if (message.text[1] >= "1" and message.text[1] <= "8"):
-                        bot.send_message(message.from_user.id, "я в муве")
-                        for board in boards:
-                            if ((message.from_user.id == board.black_id and
-                                 board.whose_move_it_is == "black")
-                                    or
-                                    (message.from_user.id == board.white_id and
-                                     board.whose_move_it_is == "white")):
-                                if board.move_this_chess_piece(move_coordinates_creator(message.text)[0], move_coordinates_creator(message.text)[1]):
-                                    if board.whose_move_it_is == 'white':
-                                        board.whose_move_it_is = 'black'
-                                    else:
-                                        board.whose_move_it_is = 'white'
-                                    bot.send_message(message.from_user.id, "принято"+' '+board.whose_move_it_is)
-                                    drawer = Drawer(board)
-                                    drawer.make_board_for_print()
-                                    with open(drawer.bot_print(), 'rb') as photo:
-                                        bot.send_photo(message.from_user.id, photo)
-                                    bot.send_message(message.from_user.id, board.whose_move_it_is)
-                                    wait(message)
-                                    bot.register_next_step_handler(message, get_move)
-                                    #bot.register_next_step_handler(message, wait_for_move)
-                                else:
-                                    bot.send_message(message.from_user.id, "этот ход невозможно сделать")
-                                    bot.register_next_step_handler(message, get_move)
-     #               else:
-    #                   bot.send_message(message.from_user.id, "это не похоже на ход")
-    #                    bot.register_next_step_handler(message, get_move)
+    if((message.text.len() == 5) and
+      (message.text[0] >= "a" and message.text[0] <= "h") and
+      (message.text[1] >= "1" and message.text[1] <= "8") and
+      (message.text[2] == " " or message.text[2] == "-") and
+      (message.text[3] >= "a" and message.text[3] <= "h") and
+      (message.text[1] >= "1" and message.text[1] <= "8")):
+      bot.send_message(message.from_user.id, "я в муве")
+      for board in boards:
+        if ((message.from_user.id == board.black_id and
+            board.whose_move_it_is == "black")
+            or
+            (message.from_user.id == board.white_id and
+            board.whose_move_it_is == "white")):
+                if board.move_this_chess_piece(move_coordinates_creator(message.text)[0], move_coordinates_creator(message.text)[1]):
+                    if board.whose_move_it_is == 'white':
+                        board.whose_move_it_is = 'black'
+                    else:
+                        board.whose_move_it_is = 'white'
+                    bot.send_message(message.from_user.id, "принято"+' '+board.whose_move_it_is)
+                    drawer = Drawer(board)
+                    drawer.make_board_for_print()
+                    with open(drawer.bot_print(), 'rb') as photo:
+                        bot.send_photo(message.from_user.id, photo)
+                    bot.send_message(message.from_user.id, board.whose_move_it_is)
+                    wait(message)
+                    bot.register_next_step_handler(message, get_move)
+                else:
+                    bot.send_message(message.from_user.id, "этот ход невозможно сделать")
+                    bot.register_next_step_handler(message, get_move)
+                        
+    else:
+        bot.send_message(message.from_user.id, "это не похоже на ход")
+        bot.register_next_step_handler(message, get_move)
 
 def wait(message):
     bot.send_message(message.from_user.id, 'я вейт')
