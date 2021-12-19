@@ -195,7 +195,7 @@ class Board(Chess_piece):
 			return self.is_this_move_pseudo_legal_with_interruptions(resulting_figure.position, moving_figure.position)
 		move_vector = [target_position[0] - initial_position[0], target_position[1] - initial_position[1]]
 		legality = self.is_this_move_pseudo_legal_without_interruptions(initial_position, target_position)
-		if legality != True:
+		if legality != True and legality != "Рокировка возможна":
 			return legality
 		else:
 			if moving_figure.type == 'P' or moving_figure.type == 'N':
@@ -303,6 +303,7 @@ class Board(Chess_piece):
 
 
 # print(brd.is_it_a_check([4, 0], [4,1]))
+# print(brd.is_this_move_legal([0,0], [4,0] ))
 # print(brd.is_this_move_pseudo_legal_with_interruptions([4,0], [4,1]))
 
 # pr_br(brd)
