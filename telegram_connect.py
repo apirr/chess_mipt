@@ -9,7 +9,7 @@ bot = telebot.TeleBot("5018966046:AAH_8hqUJuQbEUJEGYTwNM4U5PK2rvcjfI4")
 @bot.message_handler(content_types=['text'])
 
 def get_start(message):
-    if message.text.lower == "начать игру":
+    if message.text.lower() == "начать игру":
         bot.send_message(message.from_user.id, "хотите присоединиться или начать новую?")
         bot.register_next_step_handler(message, password_choose)
 
@@ -18,7 +18,7 @@ def get_start(message):
         bot.register_next_step_handler(message, get_start)
 
 def password_choose(message):
-    if message.text.lower == "начать новую" or message.text.lower == "новую":
+    if message.text.lower() == "начать новую" or message.text.lower() == "новую":
         bot.send_message(message.from_user.id, "придумайте пароль")
         bot.register_next_step_handler(message, password_creating)
     elif message.text == "хочу присоединиться" or message.text == "присоединиться":
@@ -29,7 +29,7 @@ def password_choose(message):
         bot.register_next_step_handler(message, password_choose)
 
 def password_creating(message):
-    if message.text.lower == "вернуться" or message.text.lower == "назад":
+    if message.text.lower() == "вернуться" or message.text.lower() == "назад":
         bot.register_next_step_handler(message, get_start)
     flag = True
     for board in boards:
@@ -49,7 +49,7 @@ def password_creating(message):
         bot.register_next_step_handler(message, get_move)
 
 def password_writing(message):
-    if message.text.lower == "вернуться" or message.text.lower == "назад":
+    if message.text.lower() == "вернуться" or message.text.lower() == "назад":
         bot.register_next_step_handler(message, get_start)
     flag = True
     for board in boards:
