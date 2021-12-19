@@ -72,11 +72,11 @@ def password_writing(message):
 
 def get_move(message):
     if((len(message.text) == 5) and
-      (message.text[0] >= "a" and message.text[0] <= "h") and
-      (message.text[1] >= "1" and message.text[1] <= "8") and
-      (message.text[2] == " " or message.text[2] == "-") and
-      (message.text[3] >= "a" and message.text[3] <= "h") and
-      (message.text[1] >= "1" and message.text[1] <= "8")):
+      (message.text.lower()[0] >= "a" and message.text.lower()[0] <= "h") and
+      (message.text.lower()[1] >= "1" and message.text.lower()[1] <= "8") and
+      (message.text.lower()[2] == " " or message.text.lower()[2] == "-") and
+      (message.text.lower()[3] >= "a" and message.text.lower()[3] <= "h") and
+      (message.text.lower()[1] >= "1" and message.text.lower()[1] <= "8")):
       for board in boards:
         if ((message.from_user.id == board.black_id and
             board.whose_move_it_is == "b")
@@ -89,7 +89,6 @@ def get_move(message):
                     drawer.make_board_for_print()
                     with open(drawer.bot_print(), 'rb') as photo:
                         bot.send_photo(message.from_user.id, photo)
-                    bot.send_message(message.from_user.id, board.whose_move_it_is)
                     wait(message)
                     bot.register_next_step_handler(message, get_move)
                 else:
@@ -143,4 +142,4 @@ def move_coordinates_creator(move):
     finish_position = [mas[1], int(move[4]) - 1]
     return start_position, finish_position
 
-bot.polling(none_stop=False, interval=4)
+bot.polling(none_stop=True, interval=0)
