@@ -118,8 +118,8 @@ class Board(Chess_piece):
 		self.chess_pieces[5][7] = Chess_piece('B', 'w', [5, 0])
 		self.chess_pieces[6][7] = Chess_piece('N', 'w', [6, 0])
 		self.chess_pieces[7][7] = Chess_piece('R', 'w', [7, 0])
-		self.black_id = white_id
-		self.white_id = 'white'
+		self.black_id = 'black'
+		self.white_id = white_id
 		self.game_password = game_password
 		self.whose_move_it_is = 'white' #меняйте после каждого успешного хода
 		self.is_there_a_check_against_the_white = False
