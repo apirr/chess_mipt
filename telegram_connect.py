@@ -9,26 +9,28 @@ bot = telebot.TeleBot("5018966046:AAH_8hqUJuQbEUJEGYTwNM4U5PK2rvcjfI4")
 @bot.message_handler(content_types=['text'])
 
 def get_start(message):
-    if message.text == "Начать игру":
+    if message.text.lower == "начать игру":
         bot.send_message(message.from_user.id, "хотите присоединиться или начать новую?")
         bot.register_next_step_handler(message, password_choose)
 
     else:
-        bot.send_message(message.from_user.id, "Я тебя не понимаю, напиши Начать игру")
+        bot.send_message(message.from_user.id, "Я тебя не понимаю, напиши начать игру")
         bot.register_next_step_handler(message, get_start)
 
 def password_choose(message):
-    if message.text == "начать новую":
+    if message.text.lower == "начать новую" or message.text.lower == "новую":
         bot.send_message(message.from_user.id, "придумайте пароль")
         bot.register_next_step_handler(message, password_creating)
     elif message.text == "хочу присоединиться" or message.text == "присоединиться":
         bot.send_message(message.from_user.id, "напишите пароль своего соперника")
         bot.register_next_step_handler(message, password_writing)
     else:
-        bot.send_message(message.from_user.id, "Я тебя не понимаю, напиши Начать игру")
+        bot.send_message(message.from_user.id, "Я тебя не понимаю, скажи хочешь начать новую игру или присоединиться")
         bot.register_next_step_handler(message, password_choose)
 
 def password_creating(message):
+    if message.text.lower == "вернуться" or message.text.lower == "назад":
+        bot.register_next_step_handler(message, get_start)
     flag = True
     for board in boards:
         if message.text == board.game_password:
@@ -47,11 +49,13 @@ def password_creating(message):
         bot.register_next_step_handler(message, get_move)
 
 def password_writing(message):
+    if message.text.lower == "вернуться" or message.text.lower == "назад":
+        bot.register_next_step_handler(message, get_start)
     flag = True
     for board in boards:
         if message.text == board.game_password:
             flag = False
-            bot.send_message(message.from_user.id, "пароль найден вы черный")
+            bot.send_message(message.from_user.id, "пароль найден вы играете за черных")
             board.black_id = message.from_user.id
             bot.register_next_step_handler(message, wait_for_move)
             break
