@@ -13,6 +13,12 @@ GLOBAL_CHESS_PIECES_MOVES = {
 }
 
 def pr_br(brd):
+	"""
+	This function prints the board on input 
+
+    Args:
+        brd (Board): The board to be printed
+    """
 	for array in brd.chess_pieces:
 		for el in array:
 			print(el.type+el.color, end = ' ')
@@ -20,6 +26,16 @@ def pr_br(brd):
 	(brd.chess_pieces[1][6].can_it_go_there([1, 4]))
 
 def sign(x):
+	"""
+	Calculates the sign of a variable
+
+    Args:
+        x (float): the variable.
+
+    Returns:
+        int: the sign(x) value. Is in the {-1, 0, 1} set.
+
+    """
 	if(x>0):
 		return 1
 	elif(x<0):
@@ -28,26 +44,21 @@ def sign(x):
 		return 0
 
 class Chess_piece:
-	'''
-	МЕТОДЫ
-	
-	move_vectors
-	is_dead
-	is_in_bounds
-	can_it_go_there
-
-	'''
 
 	def __init__(self, type='empty', color='empty', position ='empty'):
-		'''
-		ПОЛЯ
 
-		self.type --- строка с типом фигуры. 'K', 'R', 'B', 'Q', 'N', 'P'
-		self.color --- строка с цветом фигуры 'b', 'w'
+	"""
+	This is the __init__ of the chess piece
+
 		self.dead --- bool с мертвостью фигуры
-		self.position --- tuple с двумя числами от 0 до 7
 		self.have_i_moved --- то, ходила ли фигура в этой игре
-		'''
+
+    Args:
+        type (string): Chess piece type. 'K', 'R', 'B', 'Q', 'N', 'P'
+        color (string): Chess piece color. 'b' or 'w'
+        position (tuple): the chess piece position: [x, y] 0 ≤ x ≤ 7, 0 ≤ y ≤ 7
+
+    """
 		assert (color == 'w' or color == 'b' or color == 'empty')
 		#assert (((0 <= position[0] <= 7) and (0 <= position[0] <= 7)) or position == 'empty')
 		self.type = type
@@ -57,26 +68,51 @@ class Chess_piece:
 		self.have_i_moved = False
 
 	def move_vectors(self):
-		'''
-		Возвращает возможные векторы перемещения для этой фигуры (принципиально возможные)
-		'''
+	"""
+	Calculates the possible move vectors. NOT FOR USE OUTSIDE THIS CODE!
+
+    Returns:
+        (tuple): the possible move vectors of a chess piece
+
+    """
 		if self.type != "P":
 			return GLOBAL_CHESS_PIECES_MOVES.get(self.type)
 		else:
 			return GLOBAL_CHESS_PIECES_MOVES.get(self.type + self.color)
 
 	def is_dead(self):
+	"""
+	Checks if the chess_piece is dead. NOT FOR USE OUTSIDE THIS CODE!
+
+    Returns:
+        (bool): deadness of a piece
+
+    """
 		return self.dead  
 
 	def is_in_bounds(self, position=None):
+	"""
+	Checks if a chess piece coords are in bounds. NOT FOR USE OUTSIDE THIS CODE!
+
+    Returns:
+        (bool):  is a piece out of bounds?
+
+    """
 		if position == None:
 			position = self.position
 		return ((0 <= position[0] <= 7) and (0 <= position[1] <= 7))
 
 	def can_it_go_there(self, target_position):
-		# НЕ РАБОТАЕТ ДЛЯ ПЕШЕК. РОКИРОВКИ ТОЖЕ НЕ ТУТ проверяет находится ли точка на которую хотим сходить. 
-		# НЕЛЬЗЯ ИСПОЛЬЗОВАТЬ ЭТОТ МЕТОД ЕСЛИ ВЫ НЕ ПОНИМАЕТЕ ЧТО ТВОРИТЕ С ЭТИМ МЕТОДОМ. ИСПОЛЬЗУЙТЕ МЕТОД В КЛАССЕ BOARD
-		# assert self.type != 'P'
+
+	"""
+	Checks if the chess_piece can go to target_position. Does not work for pawns or castling. NOT FOR USE OUTSIDE THIS FILE!
+
+    Args:
+       target_position (tuple): target position
+    Returns:
+    	(bool): if the chess_piece can go to target_position -- True, else -- False
+    """
+
 		can_it_go_there = False
 		if not self.is_in_bounds(target_position):
 			return False
@@ -90,7 +126,16 @@ class Chess_piece:
 				can_it_go_there = True
 		return can_it_go_there
 	def return_a_unit_vector(self, vector):
-		'''Возвращает единичный вектор в ту сторону, в которую хочется сходить. Нужно, чтобы итеративно проверить не стоит ли кого на пути. Принимает на вход вектор.'''
+
+	"""
+	Returns a unit vector. NOT FOR USE OUTSIDE THIS FILE! Возвращает единичный вектор в ту сторону, в которую хочется сходить. Нужно, чтобы итеративно проверить не стоит ли кого на пути.
+	Принимает на вход вектор.
+
+    Args:
+       vector (tuple): vector [a, b]
+    Returns:
+    	(tuple): [sign(vector[0]), sign(vector[1])]
+    """
 		if self.type == 'empty':
 			return [0, 0]
 		else:
@@ -142,15 +187,32 @@ class Board(Chess_piece):
 		self.is_there_a_check_against_the_black = False
 
 	def next_move(self):
+		"""Gives the move to the other side"""
 		if(self.whose_move_it_is == 'w'):
 			self.whose_move_it_is = 'b'
 		else:
 			self.whose_move_it_is = 'w'
 
-	def is_in_bounds(self, position=None):
+	def is_in_bounds(self, position = [0, 0]):
+		"""Checks if a position is in bounds 
+		Args:
+		position (tuple): position checked
+		Returns:
+		(bool): is it in bounds
+		"""
 		return ((0 <= position[0] <= 7) and (0 <= position[1] <= 7))	
 
 	def is_this_move_pseudo_legal_without_interruptions(self, initial_position, target_position):
+
+		"""
+		NOT FOR USE OUTSIDE THIS FILE! Checks if a move vector within the allowed vectors for this piece.
+		Args:
+		initial_position (tuple): initial position
+		target_position (tuple): target position
+		Returns:
+		(bool): if it is not a castling
+		(string): if it is a castling and it is possible
+		"""
 		moving_figure = self.chess_pieces[initial_position[0]][initial_position[1]]
 		resulting_figure = self.chess_pieces[target_position[0]][target_position[1]]
 
@@ -170,9 +232,9 @@ class Board(Chess_piece):
 				return True
 			elif ([moving_figure.position[0] - 1, moving_figure.position[1] + 1] == target_position) and (resulting_figure.position != 'empty'):
 				return True
-		elif(moving_figure.type == "P" and self.chess_pieces[initial_position[0]][initial_position[1]].color == 'w' and resulting_figure.color == 'empty' and move_vector == [0, 2]):
+		elif(moving_figure.type == "P" and self.chess_pieces[initial_position[0]][initial_position[1]].color == 'w' and resulting_figure.color == 'empty' and move_vector == [0, 2]) and self.chess_pieces[moving_figure.position[0]][moving_figure.position[1] + 1].type == 'empty':
 			return True
-		elif(moving_figure.type == "P" and self.chess_pieces[initial_position[0]][initial_position[1]].color == 'b' and resulting_figure.color == 'empty' and move_vector == [0, -2]):
+		elif(moving_figure.type == "P" and self.chess_pieces[initial_position[0]][initial_position[1]].color == 'b' and resulting_figure.color == 'empty' and move_vector == [0, -2]) and self.chess_pieces[moving_figure.position[0]][moving_figure.position[1] - 1].type == 'empty':
 			return True				
 		elif(moving_figure.type == "P" and moving_figure.color == 'b' and resulting_figure.color == 'w'):
 			if ([moving_figure.position[0] + 1, moving_figure.position[1] - 1] == target_position) and (resulting_figure.position != 'empty'):
@@ -188,31 +250,82 @@ class Board(Chess_piece):
 		else:
 			return moving_figure.can_it_go_there(target_position) 
 
+	# def is_this_move_pseudo_legal_with_interruptions(self, initial_position, target_position):
+	# 	moving_figure = self.chess_pieces[initial_position[0]][initial_position[1]]
+	# 	resulting_figure = self.chess_pieces[target_position[0]][target_position[1]]
+	# 	if moving_figure.type == "K" and resulting_figure.type == "R" and moving_figure.color == resulting_figure.color:
+	# 		return self.is_this_move_pseudo_legal_with_interruptions(resulting_figure.position, moving_figure.position)
+	# 	move_vector = [target_position[0] - initial_position[0], target_position[1] - initial_position[1]]
+	# 	legality = self.is_this_move_pseudo_legal_without_interruptions(initial_position, target_position)
+	# 	if legality != True and legality != "Рокировка возможна":
+	# 		return legality
+	# 	else:
+	# 		if moving_figure.type == 'P' or moving_figure.type == 'N':
+	# 			return legality
+	# 		unit_vector = copy.deepcopy(moving_figure.return_a_unit_vector(move_vector))
+	# 		iterating_vector = copy.deepcopy(unit_vector)
+	# 	# кусок кода далее проверяет, можно ли так походить, проверяя можно ли так походить на каждую клетку по прямой соединяющей начальную и конечную точки
+	# 		while(iterating_vector != move_vector and (abs(iterating_vector[0])+abs(iterating_vector[1]) < 200)): #второе условие на всякий случай -- если вдруг все пойдет неправильно чтобы цикл не стал бесконечным 
+	# 			temporary_target_position = [copy.deepcopy(initial_position[0]) + copy.deepcopy(iterating_vector[0]), copy.deepcopy(initial_position[1]) + copy.deepcopy(iterating_vector[1])]
+	# 			if self.chess_pieces[temporary_target_position[0]][temporary_target_position[1]].type != 'empty':
+	# 				print(initial_position, const_vector, iterating_vector, legality, unit_vector)
+	# 				return False
+	# 			else:
+	# 				iterating_vector = [copy.deepcopy(iterating_vector[0]) + copy.deepcopy(unit_vector[0]), copy.deepcopy(iterating_vector[1]) + copy.deepcopy(unit_vector[1])]
+	# 		return legality
+
 	def is_this_move_pseudo_legal_with_interruptions(self, initial_position, target_position):
+		"""
+		NOT FOR USE OUTSIDE THIS FILE! Checks if a move vector within the allowed vectors for this piece AND if there is standing in the way.
+		Args:
+		initial_position (tuple): initial position
+		target_position (tuple): target position
+		Returns:
+		(bool): if it is not a castling
+		(string): if it is a castling and it is possible
+		"""
 		moving_figure = self.chess_pieces[initial_position[0]][initial_position[1]]
 		resulting_figure = self.chess_pieces[target_position[0]][target_position[1]]
-		if moving_figure.type == "K" and resulting_figure.type == "R" and moving_figure.color == resulting_figure.color:
-			return self.is_this_move_pseudo_legal_with_interruptions(resulting_figure.position, moving_figure.position)
-		move_vector = [target_position[0] - initial_position[0], target_position[1] - initial_position[1]]
 		legality = self.is_this_move_pseudo_legal_without_interruptions(initial_position, target_position)
+
 		if legality != True and legality != "Рокировка возможна":
 			return legality
 		else:
 			if moving_figure.type == 'P' or moving_figure.type == 'N':
 				return legality
-			unit_vector = moving_figure.return_a_unit_vector(move_vector)
-			iterating_vector = unit_vector
-		# кусок кода далее проверяет, можно ли так походить, проверяя можно ли так походить на каждую клетку по прямой соединяющей начальную и конечную точки
-			while(iterating_vector != move_vector and (abs(iterating_vector[0])+abs(iterating_vector[1]) < 200)): #второе условие на всякий случай -- если вдруг все пойдет неправильно чтобы цикл не стал бесконечным 
-				temporary_target_position = [initial_position[0] + iterating_vector[0], initial_position[1] + iterating_vector[1]]
-				if self.chess_pieces[temporary_target_position[0]][temporary_target_position[1]].type != 'empty':
-					return False
-				else:
-					iterating_vector = [iterating_vector[0] + unit_vector[0], iterating_vector[1] + unit_vector[1]]
-			return legality
+
+		if moving_figure.type == "K" and resulting_figure.type == "R" and moving_figure.color == resulting_figure.color:
+			return self.is_this_move_pseudo_legal_with_interruptions(resulting_figure.position, moving_figure.position)
+
+		move_vector = [target_position[0] - initial_position[0], target_position[1] - initial_position[1]]
+		unit_vector = [sign(copy.copy(move_vector[0])), sign(copy.copy(move_vector[1]))]
+		result_vector = [move_vector[0] + unit_vector[0], move_vector[1] + unit_vector[1]] #должен получиться в результате цикла
+		iterating_vector = copy.deepcopy(unit_vector)
+		if legality == "Рокировка возможна":
+			result_vector = copy.copy(move_vector)
+
+		while iterating_vector != result_vector:
+			print(iterating_vector, unit_vector)
+			temporary_target = [initial_position[0]+iterating_vector[0], initial_position[1]+iterating_vector[1]]
+			print(temporary_target)
+			if self.chess_pieces[temporary_target[0]][temporary_target[1]].type != 'empty':
+				return False
+			if(temporary_target == target_position):
+				break
+			iterating_vector = [iterating_vector[0] + unit_vector[0], iterating_vector[1] + unit_vector[1]]
+		return legality
 
 		
 	def pseudo_move_this_chess_piece(self, initial_position, target_position):
+		"""
+		NOT FOR USE OUTSIDE THIS FILE! Makes a move if it is pseudo legal. Returns stuff also.
+		Args:
+		initial_position (tuple): initial position
+		target_position (tuple): target position
+		Returns:
+		(bool): if it is not a castling
+		(string): if it is a castling and it is possible
+		"""
 		moving_figure = self.chess_pieces[initial_position[0]][initial_position[1]]
 		resulting_figure = self.chess_pieces[target_position[0]][target_position[1]]
 		is_this_move_legal = self.is_this_move_pseudo_legal_with_interruptions(initial_position, target_position)
@@ -232,6 +345,14 @@ class Board(Chess_piece):
 			self.chess_pieces[target_position[0]][target_position[1]] = moving_figure
 
 	def is_it_a_check(self, initial_position, target_position):
+		"""
+		Checks if a check is present after the following move.
+		Args:
+		initial_position (tuple): initial position
+		target_position (tuple): target position
+		Returns:
+		(tuple): [check_against_the_white, check_against_the_black]
+		"""
 		check_against_the_white = False
 		check_against_the_black = False
 		backup = copy.deepcopy(self.chess_pieces)
@@ -262,6 +383,15 @@ class Board(Chess_piece):
 
 
 	def is_this_move_legal(self, initial_position, target_position):
+		"""
+		Checks if a move is legal.
+		Args:
+		initial_position (tuple): initial position
+		target_position (tuple): target position
+		Returns:
+		(bool): if there is not problem
+		(string): if there is a problem
+		"""
 		moving_figure = self.chess_pieces[initial_position[0]][initial_position[1]]
 		resulting_figure = self.chess_pieces[target_position[0]][target_position[1]]
 
@@ -282,6 +412,14 @@ class Board(Chess_piece):
 		 return True
 
 	def move_this_chess_piece(self, initial_position, target_position):
+		"""
+		Makes a move if it is legal. Returns stuff also. Also gives the move to the other side if successful.
+		Args:
+		initial_position (tuple): initial position
+		target_position (tuple): target position
+		Returns:
+		(bool): legality of a move
+		"""
 		legality = self.is_this_move_legal(initial_position, target_position)
 		if legality != True:
 			return False
@@ -289,52 +427,3 @@ class Board(Chess_piece):
 			self.pseudo_move_this_chess_piece(initial_position, target_position)
 			self.next_move()
 			return True
-
-
-# brd = Board('oieef', 'uinfui')
-
-# brd.move_this_chess_piece([4, 1], [4, 3])
-# brd.move_this_chess_piece([3, 0], [6, 3])
-# brd.move_this_chess_piece([2,1], [2,3])
-# brd.move_this_chess_piece([3,1], [3,3])
-# brd.move_this_chess_piece([2,0], [5,3])
-# brd.move_this_chess_piece([1,0], [3, 1])
-# print(brd.pseudo_move_this_chess_piece([0,0], [4, 0])) 
-
-
-# print(brd.is_it_a_check([4, 0], [4,1]))
-# print(brd.is_this_move_legal([0,0], [4,0] ))
-# print(brd.is_this_move_pseudo_legal_with_interruptions([4,0], [4,1]))
-
-# pr_br(brd)
-
-
-# # print(brd.is_this_move_legal([1, 6], [2,5]))
-# print(brd.move_this_chess_piece([1, 6], [1,4]))
-# print(brd.move_this_chess_piece([1,4], [1,3]))
-# print(brd.move_this_chess_piece([1,3], [1,2]))
-# print(brd.move_this_chess_piece([1,2], [0,1]))
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
