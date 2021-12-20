@@ -46,8 +46,7 @@ def sign(x):
 class Chess_piece:
 
 	def __init__(self, type='empty', color='empty', position ='empty'):
-
-	"""
+		'''
 	This is the __init__ of the chess piece
 
 		self.dead --- bool с мертвостью фигуры
@@ -57,8 +56,7 @@ class Chess_piece:
         type (string): Chess piece type. 'K', 'R', 'B', 'Q', 'N', 'P'
         color (string): Chess piece color. 'b' or 'w'
         position (tuple): the chess piece position: [x, y] 0 ≤ x ≤ 7, 0 ≤ y ≤ 7
-
-    """
+		'''
 		assert (color == 'w' or color == 'b' or color == 'empty')
 		#assert (((0 <= position[0] <= 7) and (0 <= position[0] <= 7)) or position == 'empty')
 		self.type = type
@@ -68,50 +66,50 @@ class Chess_piece:
 		self.have_i_moved = False
 
 	def move_vectors(self):
-	"""
+		"""
 	Calculates the possible move vectors. NOT FOR USE OUTSIDE THIS CODE!
 
     Returns:
         (tuple): the possible move vectors of a chess piece
 
-    """
+	    """
 		if self.type != "P":
 			return GLOBAL_CHESS_PIECES_MOVES.get(self.type)
 		else:
 			return GLOBAL_CHESS_PIECES_MOVES.get(self.type + self.color)
 
 	def is_dead(self):
-	"""
+		"""
 	Checks if the chess_piece is dead. NOT FOR USE OUTSIDE THIS CODE!
 
     Returns:
         (bool): deadness of a piece
 
-    """
+    	"""
 		return self.dead  
 
 	def is_in_bounds(self, position=None):
-	"""
+		"""
 	Checks if a chess piece coords are in bounds. NOT FOR USE OUTSIDE THIS CODE!
 
     Returns:
         (bool):  is a piece out of bounds?
 
-    """
+    	"""
 		if position == None:
 			position = self.position
 		return ((0 <= position[0] <= 7) and (0 <= position[1] <= 7))
 
 	def can_it_go_there(self, target_position):
 
-	"""
+		"""
 	Checks if the chess_piece can go to target_position. Does not work for pawns or castling. NOT FOR USE OUTSIDE THIS FILE!
 
     Args:
        target_position (tuple): target position
     Returns:
     	(bool): if the chess_piece can go to target_position -- True, else -- False
-    """
+    	"""
 
 		can_it_go_there = False
 		if not self.is_in_bounds(target_position):
@@ -127,7 +125,7 @@ class Chess_piece:
 		return can_it_go_there
 	def return_a_unit_vector(self, vector):
 
-	"""
+		"""
 	Returns a unit vector. NOT FOR USE OUTSIDE THIS FILE! Возвращает единичный вектор в ту сторону, в которую хочется сходить. Нужно, чтобы итеративно проверить не стоит ли кого на пути.
 	Принимает на вход вектор.
 
@@ -135,7 +133,7 @@ class Chess_piece:
        vector (tuple): vector [a, b]
     Returns:
     	(tuple): [sign(vector[0]), sign(vector[1])]
-    """
+    	"""
 		if self.type == 'empty':
 			return [0, 0]
 		else:
@@ -143,18 +141,7 @@ class Chess_piece:
 
 
 class Board(Chess_piece):
-	'''
-	METHODS:
-
-	The only methods to be used by an end user of this code are:
-
-	is_this_move_legal(self, initial_position, target_position)  checks the legality of a move
-
-	move_this_chess_piece(self, initial_position, target_position) makes the move if it is legal and returns False otherwise
-
-	def checkmate(self, initial_position, target_position)
-
-	'''
+		
 	def __init__(self, white_id, game_password):
 		self.chess_pieces = [[1]*8, [1]*8, [1]*8, [1]*8, [1]*8, [1]*8, [1]*8, [1]*8]
 		for i in range(8):
