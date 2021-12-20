@@ -56,6 +56,7 @@ def password_creating(message):
                 if board.black_id != "black":
                     bot.send_message(message.from_user.id, "игра началась")
                     bot.send_message(message.from_user.id, "ход пишите в формате e2 e4 или e2-e4")
+                    bot.send_message(message.from_user.id, "если вы поняли, что проиграли, или хотите сдаться, пишите мат")
                     break
             bot.register_next_step_handler(message, get_move)
 
@@ -73,6 +74,7 @@ def password_writing(message):
             bot.send_message(message.from_user.id, "не пишите ничего пока не сходит ваш соперник")
             wait(message)  # мы отправляем игрока в функцию wait, потому что первых ход делает соперник
             bot.send_message(message.from_user.id, "ход пишите в формате e2 e4 или e2-e4")
+            bot.send_message(message.from_user.id, "если вы поняли, что проиграли, или хотите сдаться, пишите мат")
             bot.register_next_step_handler(message, get_move)
             # как только цикл в функции wait обрывается мы попадаем в функцию move
             break
@@ -83,13 +85,14 @@ def password_writing(message):
 
 def get_move(message):
     ''' функция нужна чтобы сделать ход
+    если игрок не признал поражение сообщением мат то
     сначала она проверяет что ход удовлетворяет формату, потом что его можно сделать
     если ход все хорошо, то функция делает ход, присылает картинку доски со сделанным ходом'''
-    if(message.text.lower() == "мат"):
-        for board in boards:
+    if(message.text.lower() == "мат"):              #проверка на мат
+        for board in boards:                        #ищем нашу доску
             if ((message.from_user.id == board.black_id and
                  board.whose_move_it_is == "b")
-                    or
+                    or      
                     (message.from_user.id == board.white_id and
                      board.whose_move_it_is == "w")):
                 if message.from_user.id == board.black_id:
