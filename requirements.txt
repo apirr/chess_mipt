@@ -1,2 +1,2 @@
-PIL version is 8.3.2
-telebot version is 4.2.2
+PIL == 8.3.2
+telebot == 4.2.2

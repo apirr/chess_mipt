@@ -250,30 +250,6 @@ class Board(Chess_piece):
 		else:
 			return moving_figure.can_it_go_there(target_position) 
 
-	# def is_this_move_pseudo_legal_with_interruptions(self, initial_position, target_position):
-	# 	moving_figure = self.chess_pieces[initial_position[0]][initial_position[1]]
-	# 	resulting_figure = self.chess_pieces[target_position[0]][target_position[1]]
-	# 	if moving_figure.type == "K" and resulting_figure.type == "R" and moving_figure.color == resulting_figure.color:
-	# 		return self.is_this_move_pseudo_legal_with_interruptions(resulting_figure.position, moving_figure.position)
-	# 	move_vector = [target_position[0] - initial_position[0], target_position[1] - initial_position[1]]
-	# 	legality = self.is_this_move_pseudo_legal_without_interruptions(initial_position, target_position)
-	# 	if legality != True and legality != "Рокировка возможна":
-	# 		return legality
-	# 	else:
-	# 		if moving_figure.type == 'P' or moving_figure.type == 'N':
-	# 			return legality
-	# 		unit_vector = copy.deepcopy(moving_figure.return_a_unit_vector(move_vector))
-	# 		iterating_vector = copy.deepcopy(unit_vector)
-	# 	# кусок кода далее проверяет, можно ли так походить, проверяя можно ли так походить на каждую клетку по прямой соединяющей начальную и конечную точки
-	# 		while(iterating_vector != move_vector and (abs(iterating_vector[0])+abs(iterating_vector[1]) < 200)): #второе условие на всякий случай -- если вдруг все пойдет неправильно чтобы цикл не стал бесконечным 
-	# 			temporary_target_position = [copy.deepcopy(initial_position[0]) + copy.deepcopy(iterating_vector[0]), copy.deepcopy(initial_position[1]) + copy.deepcopy(iterating_vector[1])]
-	# 			if self.chess_pieces[temporary_target_position[0]][temporary_target_position[1]].type != 'empty':
-	# 				print(initial_position, const_vector, iterating_vector, legality, unit_vector)
-	# 				return False
-	# 			else:
-	# 				iterating_vector = [copy.deepcopy(iterating_vector[0]) + copy.deepcopy(unit_vector[0]), copy.deepcopy(iterating_vector[1]) + copy.deepcopy(unit_vector[1])]
-	# 		return legality
-
 	def is_this_move_pseudo_legal_with_interruptions(self, initial_position, target_position):
 		"""
 		NOT FOR USE OUTSIDE THIS FILE! Checks if a move vector within the allowed vectors for this piece AND if there is standing in the way.
