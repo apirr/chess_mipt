@@ -85,6 +85,13 @@ def get_move(message):
     ''' функция нужна чтобы сделать ход
     сначала она проверяет что ход удовлетворяет формату, потом что его можно сделать
     если ход все хорошо, то функция делает ход, присылает картинку доски со сделанным ходом'''
+    if(message.text.lower() == "мат"):
+        if message.from_user.id == board.black_id:
+            bot.send_message(board.black_id, "Вы победили")
+        else:
+            bot.send_message(board.white_id, "Вы победили")
+        bot.send_message(message.from_user.id, "Вы проиграли")
+        bot.register_next_step_handler(message, get_start)
     if ((len(message.text) == 5) and
             (message.text.lower()[0] >= "a" and message.text.lower()[0] <= "h") and
             (message.text.lower()[1] >= "1" and message.text.lower()[1] <= "8") and
