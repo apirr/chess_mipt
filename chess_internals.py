@@ -170,9 +170,9 @@ class Board(Chess_piece):
 				return True
 			elif ([moving_figure.position[0] - 1, moving_figure.position[1] + 1] == target_position) and (resulting_figure.position != 'empty'):
 				return True
-		elif(moving_figure.type == "P" and self.chess_pieces[initial_position[0]][initial_position[1]].color == 'w' and resulting_figure.color == 'empty' and move_vector == [0, 2]):
+		elif(moving_figure.type == "P" and self.chess_pieces[initial_position[0]][initial_position[1]].color == 'w' and resulting_figure.color == 'empty' and move_vector == [0, 2]) and self.chess_pieces[moving_figure.position[0]][moving_figure.position[1] + 1].type == 'empty':
 			return True
-		elif(moving_figure.type == "P" and self.chess_pieces[initial_position[0]][initial_position[1]].color == 'b' and resulting_figure.color == 'empty' and move_vector == [0, -2]):
+		elif(moving_figure.type == "P" and self.chess_pieces[initial_position[0]][initial_position[1]].color == 'b' and resulting_figure.color == 'empty' and move_vector == [0, -2]) and self.chess_pieces[moving_figure.position[0]][moving_figure.position[1] - 1].type == 'empty':
 			return True				
 		elif(moving_figure.type == "P" and moving_figure.color == 'b' and resulting_figure.color == 'w'):
 			if ([moving_figure.position[0] + 1, moving_figure.position[1] - 1] == target_position) and (resulting_figure.position != 'empty'):
@@ -188,28 +188,61 @@ class Board(Chess_piece):
 		else:
 			return moving_figure.can_it_go_there(target_position) 
 
+	# def is_this_move_pseudo_legal_with_interruptions(self, initial_position, target_position):
+	# 	moving_figure = self.chess_pieces[initial_position[0]][initial_position[1]]
+	# 	resulting_figure = self.chess_pieces[target_position[0]][target_position[1]]
+	# 	if moving_figure.type == "K" and resulting_figure.type == "R" and moving_figure.color == resulting_figure.color:
+	# 		return self.is_this_move_pseudo_legal_with_interruptions(resulting_figure.position, moving_figure.position)
+	# 	move_vector = [target_position[0] - initial_position[0], target_position[1] - initial_position[1]]
+	# 	legality = self.is_this_move_pseudo_legal_without_interruptions(initial_position, target_position)
+	# 	if legality != True and legality != "Рокировка возможна":
+	# 		return legality
+	# 	else:
+	# 		if moving_figure.type == 'P' or moving_figure.type == 'N':
+	# 			return legality
+	# 		unit_vector = copy.deepcopy(moving_figure.return_a_unit_vector(move_vector))
+	# 		iterating_vector = copy.deepcopy(unit_vector)
+	# 	# кусок кода далее проверяет, можно ли так походить, проверяя можно ли так походить на каждую клетку по прямой соединяющей начальную и конечную точки
+	# 		while(iterating_vector != move_vector and (abs(iterating_vector[0])+abs(iterating_vector[1]) < 200)): #второе условие на всякий случай -- если вдруг все пойдет неправильно чтобы цикл не стал бесконечным 
+	# 			temporary_target_position = [copy.deepcopy(initial_position[0]) + copy.deepcopy(iterating_vector[0]), copy.deepcopy(initial_position[1]) + copy.deepcopy(iterating_vector[1])]
+	# 			if self.chess_pieces[temporary_target_position[0]][temporary_target_position[1]].type != 'empty':
+	# 				print(initial_position, const_vector, iterating_vector, legality, unit_vector)
+	# 				return False
+	# 			else:
+	# 				iterating_vector = [copy.deepcopy(iterating_vector[0]) + copy.deepcopy(unit_vector[0]), copy.deepcopy(iterating_vector[1]) + copy.deepcopy(unit_vector[1])]
+	# 		return legality
+
 	def is_this_move_pseudo_legal_with_interruptions(self, initial_position, target_position):
 		moving_figure = self.chess_pieces[initial_position[0]][initial_position[1]]
 		resulting_figure = self.chess_pieces[target_position[0]][target_position[1]]
-		if moving_figure.type == "K" and resulting_figure.type == "R" and moving_figure.color == resulting_figure.color:
-			return self.is_this_move_pseudo_legal_with_interruptions(resulting_figure.position, moving_figure.position)
-		move_vector = [target_position[0] - initial_position[0], target_position[1] - initial_position[1]]
 		legality = self.is_this_move_pseudo_legal_without_interruptions(initial_position, target_position)
+
 		if legality != True and legality != "Рокировка возможна":
 			return legality
 		else:
 			if moving_figure.type == 'P' or moving_figure.type == 'N':
 				return legality
-			unit_vector = moving_figure.return_a_unit_vector(move_vector)
-			iterating_vector = unit_vector
-		# кусок кода далее проверяет, можно ли так походить, проверяя можно ли так походить на каждую клетку по прямой соединяющей начальную и конечную точки
-			while(iterating_vector != move_vector and (abs(iterating_vector[0])+abs(iterating_vector[1]) < 200)): #второе условие на всякий случай -- если вдруг все пойдет неправильно чтобы цикл не стал бесконечным 
-				temporary_target_position = [initial_position[0] + iterating_vector[0], initial_position[1] + iterating_vector[1]]
-				if self.chess_pieces[temporary_target_position[0]][temporary_target_position[1]].type != 'empty':
-					return False
-				else:
-					iterating_vector = [iterating_vector[0] + unit_vector[0], iterating_vector[1] + unit_vector[1]]
-			return legality
+
+		if moving_figure.type == "K" and resulting_figure.type == "R" and moving_figure.color == resulting_figure.color:
+			return self.is_this_move_pseudo_legal_with_interruptions(resulting_figure.position, moving_figure.position)
+
+		move_vector = [target_position[0] - initial_position[0], target_position[1] - initial_position[1]]
+		unit_vector = [sign(copy.copy(move_vector[0])), sign(copy.copy(move_vector[1]))]
+		result_vector = [move_vector[0] + unit_vector[0], move_vector[1] + unit_vector[1]] #должен получиться в результате цикла
+		iterating_vector = copy.deepcopy(unit_vector)
+		if legality == "Рокировка возможна":
+			result_vector = copy.copy(move_vector)
+
+		while iterating_vector != result_vector:
+			print(iterating_vector, unit_vector)
+			temporary_target = [initial_position[0]+iterating_vector[0], initial_position[1]+iterating_vector[1]]
+			print(temporary_target)
+			if self.chess_pieces[temporary_target[0]][temporary_target[1]].type != 'empty':
+				return False
+			if(temporary_target == target_position):
+				break
+			iterating_vector = [iterating_vector[0] + unit_vector[0], iterating_vector[1] + unit_vector[1]]
+		return legality
 
 		
 	def pseudo_move_this_chess_piece(self, initial_position, target_position):
@@ -293,48 +326,24 @@ class Board(Chess_piece):
 
 # brd = Board('oieef', 'uinfui')
 
-# brd.move_this_chess_piece([4, 1], [4, 3])
+# print(brd.move_this_chess_piece([4, 1], [4, 3]))
 # brd.move_this_chess_piece([3, 0], [6, 3])
 # brd.move_this_chess_piece([2,1], [2,3])
 # brd.move_this_chess_piece([3,1], [3,3])
 # brd.move_this_chess_piece([2,0], [5,3])
 # brd.move_this_chess_piece([1,0], [3, 1])
-# print(brd.pseudo_move_this_chess_piece([0,0], [4, 0])) 
+# # print(brd.pseudo_move_this_chess_piece([0,0], [4, 0])) 
 
 
-# print(brd.is_it_a_check([4, 0], [4,1]))
-# print(brd.is_this_move_legal([0,0], [4,0] ))
-# print(brd.is_this_move_pseudo_legal_with_interruptions([4,0], [4,1]))
+
+# print(brd.move_this_chess_piece([0,0], [4,0] ))
+
 
 # pr_br(brd)
 
 
-# # print(brd.is_this_move_legal([1, 6], [2,5]))
-# print(brd.move_this_chess_piece([1, 6], [1,4]))
-# print(brd.move_this_chess_piece([1,4], [1,3]))
-# print(brd.move_this_chess_piece([1,3], [1,2]))
-# print(brd.move_this_chess_piece([1,2], [0,1]))
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+# # # print(brd.is_this_move_legal([1, 6], [2,5]))
+# # print(brd.move_this_chess_piece([1, 6], [1,4]))
+# # print(brd.move_this_chess_piece([1,4], [1,3]))
+# # print(brd.move_this_chess_piece([1,3], [1,2]))
+# # print(brd.move_this_chess_piece([1,2], [0,1]))
