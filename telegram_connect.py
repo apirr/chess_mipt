@@ -9,6 +9,7 @@ bot = telebot.TeleBot(input())
 @bot.message_handler(content_types=['text'])
 
 def get_start(message):
+    # эта функция встречает игрока в начале игры
     if message.text.lower() == "начать игру":
         bot.send_message(message.from_user.id, "хотите присоединиться или начать новую?")
         bot.register_next_step_handler(message, password_choose)
@@ -18,6 +19,7 @@ def get_start(message):
         bot.register_next_step_handler(message, get_start)
 
 def password_choose(message):
+    # эта функция определяет хочет человек задать новый пароль или вписать пароль соперника
     if message.text.lower() == "вернуться" or message.text.lower() == "назад":
         bot.register_next_step_handler(message, get_start)
     if message.text.lower() == "начать новую" or message.text.lower() == "новую":
@@ -31,6 +33,7 @@ def password_choose(message):
         bot.register_next_step_handler(message, password_choose)
 
 def password_creating(message):
+    # создание доски с новым паролем
     if message.text.lower() == "вернуться" or message.text.lower() == "назад":
         bot.register_next_step_handler(message, get_start)
     else:
@@ -53,6 +56,7 @@ def password_creating(message):
             bot.register_next_step_handler(message, get_move)
 
 def password_writing(message):
+    #поиск доски с вписанным паролем соперника
     if message.text.lower() == "вернуться" or message.text.lower() == "назад":
         bot.register_next_step_handler(message, get_start)
     flag = True
@@ -71,10 +75,13 @@ def password_writing(message):
         bot.register_next_step_handler(message, password_writing)
 
 def get_move(message):
+    # функция нужна чтобы сделать ход
+    # сначала она проверяет что ход удовлетворяет формату, потом что его можно сделать
+    # если ход хороший, то функция делает ход, присылает картинку доски со сделанным ходом
     if((len(message.text) == 5) and
       (message.text.lower()[0] >= "a" and message.text.lower()[0] <= "h") and
       (message.text.lower()[1] >= "1" and message.text.lower()[1] <= "8") and
-      (message.text.lower()[2] == " " or message.text.lower()[2] == "-") and
+      (message.text.lower()[2] == " " or message.text.lower()[2] == "-") and  # проверка на правильный формат
       (message.text.lower()[3] >= "a" and message.text.lower()[3] <= "h") and
       (message.text.lower()[1] >= "1" and message.text.lower()[1] <= "8")):
       for board in boards:
@@ -83,14 +90,14 @@ def get_move(message):
             or
             (message.from_user.id == board.white_id and
             board.whose_move_it_is == "w")):
-                if board.move_this_chess_piece(move_coordinates_creator(message.text.lower())[0], move_coordinates_creator(message.text.lower())[1]):
+                if board.move_this_chess_piece(move_coordinates_creator(message.text.lower())[0], move_coordinates_creator(message.text.lower())[1]):   # проверка на возможность сделать ход
                     bot.send_message(message.from_user.id, "принято")
                     drawer = Drawer(board)
                     drawer.make_board_for_print()
-                    with open(drawer.bot_print(), 'rb') as photo:
-                        bot.send_photo(message.from_user.id, photo)
-                    wait(message)
-                    bot.register_next_step_handler(message, get_move)
+                    with open(drawer.bot_print(), 'rb') as photo: 
+                        bot.send_photo(message.from_user.id, photo)  # функция присылает картинку доски со сделанным ходом
+                    wait(message)                                   # перенапрявляем игрока в другую функцию
+                    bot.register_next_step_handler(message, get_move) # сюда мы попадаем когда цикл в функции wait обрывается 
                 else:
                     bot.send_message(message.from_user.id, "этот ход невозможно сделать")
                     bot.register_next_step_handler(message, get_move)
@@ -100,6 +107,8 @@ def get_move(message):
         bot.register_next_step_handler(message, get_move)
 
 def wait(message):
+    # эта функция ждет пока сходит соперник игрока и постоянно проверяет это
+    # как только это произошло цикл обрывается и мы попадаем снова в get_move
     flag = True
     while 1:
         if flag:
@@ -120,6 +129,7 @@ def wait(message):
             break
 
 def move_coordinates_creator(move):
+    # эта функция преобразует формат хода, написанный игроком, в формат хода необходимый методу move_this_chess_piece
     mas = []
     for i in [0, 3]:
         if move[i] == 'a':
