@@ -96,7 +96,7 @@ def get_move(message):
                     (message.from_user.id == board.white_id and
                      board.whose_move_it_is == "w")):
                 if message.from_user.id == board.black_id:
-                    ot.send_message(board.white_id, "Вы победили")
+                    bot.send_message(board.white_id, "Вы победили")
                 else:
                     bot.send_message(board.black_id, "Вы победили")
                 bot.send_message(message.from_user.id, "Вы проиграли")
